@@ -23,4 +23,5 @@ block aList
 						if $val.Href != ""
 							a
 								[href=$val.Href]
+								[target="_blank"]
 								| Download!

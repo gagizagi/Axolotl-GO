@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"net/http"
+	"sort"
 	"html/template"
 	"github.com/eknkc/amber"
 )
@@ -32,7 +33,9 @@ func Web_server() {
 }
 
 func AnimeHandler(w http.ResponseWriter, r *http.Request) {
-	templateMap["aList"].Execute(w, Get_anime_list())
+	data := Get_anime_list()
+	sort.Sort(data)
+	templateMap["aList"].Execute(w, data)
 }
 
 func StaticHandler(w http.ResponseWriter, r *http.Request) {
