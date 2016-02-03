@@ -21,13 +21,14 @@ var (
 //Initializing of the IRC client
 func init() {
 	ircobj = irc.IRC(IRC_NAME, IRC_NAME)
-	ircobj.Debug = IRC_DEBUG
 	err := ircobj.Connect(IRC_SERVER)
 	if err != nil {
 		panic(err)
 	}
-	
+	ircobj.Debug = IRC_DEBUG
 	ircobj.AddCallback("PRIVMSG", IrcMsgHandler)
+	ircobj.Join("#HORRIBLESUBS")
+	ircobj.Join("#422")
 }
 
 //irc client incomming message handler function
@@ -40,11 +41,6 @@ func IrcMsgHandler(event *irc.Event) {
 	if ReleaseWatch.MatchString(event.Message()) == true {
 		newEpisode(ReleaseWatch.FindStringSubmatch(event.Message()))
 	}
-}
-
-func IrcJoinChannels() {
-	ircobj.Join("#HORRIBLESUBS")
-	ircobj.Join("#422")
 }
 
 //new episode handler function
