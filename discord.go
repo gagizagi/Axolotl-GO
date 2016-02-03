@@ -40,7 +40,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
+	discord.Debug = true
 	discord.OnMessageCreate = DiscordMsgHandler
 	discord.OnReady = DiscordReadyHandler
 }

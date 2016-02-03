@@ -19,7 +19,7 @@ var (
 )
 
 //Initializing of the IRC client
-func init() {
+/*func init() {
 	ircobj = irc.IRC(IRC_NAME, IRC_NAME)
 	ircobj.Debug = IRC_DEBUG
 	err := ircobj.Connect(IRC_SERVER)
@@ -30,7 +30,7 @@ func init() {
 	ircobj.Join("#HORRIBLESUBS")
 	ircobj.Join("#422")
 	ircobj.AddCallback("PRIVMSG", IrcMsgHandler)
-}
+}*/
 
 //irc client incomming message handler function
 func IrcMsgHandler(event *irc.Event) {
