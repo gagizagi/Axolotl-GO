@@ -27,8 +27,6 @@ func init() {
 		panic(err)
 	}
 	
-	ircobj.Join("#HORRIBLESUBS")
-	ircobj.Join("#422")
 	ircobj.AddCallback("PRIVMSG", IrcMsgHandler)
 }
 
@@ -42,6 +40,11 @@ func IrcMsgHandler(event *irc.Event) {
 	if ReleaseWatch.MatchString(event.Message()) == true {
 		newEpisode(ReleaseWatch.FindStringSubmatch(event.Message()))
 	}
+}
+
+func IrcJoinChannels() {
+	ircobj.Join("#HORRIBLESUBS")
+	ircobj.Join("#422")
 }
 
 //new episode handler function
