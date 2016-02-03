@@ -10,6 +10,7 @@ import (
 
 
 const (
+	DISCORD_DEBUG bool = false
 	DISCORD_BOSS string = "110846867473973248"
 	DISCORD_HELP string = "***LIST OF BOT COMMANDS***\n"+
 	"Fields in [] are optional\n"+
@@ -30,7 +31,7 @@ var (
 	DISCORD_USERNAME string = os.Getenv("DISCORD_USERNAME")
 	DISCORD_PASSWORD string = os.Getenv("DISCORD_PASSWORD")
 	relevantRegex *regexp.Regexp = regexp.MustCompile(`^!\w`)
-	discord *discordgo.Session//discord session
+	discord *discordgo.Session
 )
 
 //initializes discord bot
@@ -40,9 +41,11 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	discord.Debug = true
+	
+	discord.Debug = DISCORD_DEBUG
 	discord.OnMessageCreate = DiscordMsgHandler
 	discord.OnReady = DiscordReadyHandler
+	discord.Open()
 }
 
 func DiscordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
