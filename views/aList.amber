@@ -1,0 +1,27 @@
+extends base
+
+block title
+	| | Anime
+
+block aList
+	table.table.table-condensed
+		thead
+			tr
+				th ID
+				th Name
+				th Episode
+				th Subs
+				th Link
+		tbody
+			each $val in $
+				tr
+					td #{$val.Id}
+					td #{$val.Name}
+					td #{$val.Episode}
+					td #{len($val.Subs)}
+					td
+						if $val.Href != ""
+							a
+								[href=$val.Href]
+								[target="_blank"]
+								| Download!
