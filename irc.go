@@ -2,44 +2,63 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+	"log"
 	"regexp"
-	irc "github.com/thoj/go-ircevent"
+	"strconv"
+
+	ircevent "github.com/thoj/go-ircevent"
 )
 
-const (
-	IRC_NAME string = "Axolotl"
-	IRC_SERVER string = "irc.rizon.net:6667"
-	IRC_DEBUG bool = false
-)
+//irc client options struct
+type ircConfig struct {
+	Server   string
+	Channels []string
+	Username string
+	Nickname string
+	Verbose  bool
+	Debug    bool
+}
 
 var (
-	ircobj *irc.Connection//irc client
-	ReleaseWatch *regexp.Regexp = regexp.MustCompile(`(?i)release:.+\[horriblesubs\] (.+) - ([0-9]{1,3}) \[(1080p|720p|480p)\]`)
+	ircConn *ircevent.Connection //irc connection
+	ircCfg  *ircConfig           //irc config
+	//regex parse string for newEpisode()
+	releaseWatch = regexp.MustCompile(
+		`(?i)release:.+\[horriblesubs\] (.+) - ([0-9]{1,3}) \[(1080p|720p|480p)\]`)
 )
 
-//Initializing of the IRC client
-func init() {
-	ircobj = irc.IRC(IRC_NAME, IRC_NAME)
-	err := ircobj.Connect(IRC_SERVER)
+//Starts the irc client
+func ircConnStart(c *ircConfig) {
+	ircCfg = c
+
+	ircConn = ircevent.IRC(c.Username, c.Nickname)
+	ircConn.Debug = c.Debug
+	ircConn.VerboseCallbackHandler = c.Verbose
+	ircConn.AddCallback("PRIVMSG", ircMsgHandler)
+	ircConn.AddCallback("001", ircWelcomeHandler)
+
+	err := ircConn.Connect(c.Server)
 	if err != nil {
-		panic(err)
+		log.Fatal("ircConnStart() => Connect() error:\t", err)
 	}
-	ircobj.Debug = IRC_DEBUG
-	ircobj.AddCallback("PRIVMSG", IrcMsgHandler)
-	ircobj.Join("#HORRIBLESUBS")
-	ircobj.Join("#422")
+	ircConn.Loop()
 }
 
 //irc client incomming message handler function
-func IrcMsgHandler(event *irc.Event) {
+func ircMsgHandler(e *ircevent.Event) {
 	//Samples new anime string:
 	//Release: [Anime] [HorribleSubs] Ushio to Tora - 22 [480p].mkv
 	//Release: [Anime] [HorribleSubs] Hackadoll the Animation - 09 [720p].mkv
-	ReleaseWatch := regexp.MustCompile(`(?i)release:.+\[horriblesubs\] (.+) - ([0-9]{1,3}) \[(1080p|720p|480p)\]`)
-	
-	if ReleaseWatch.MatchString(event.Message()) == true {
-		newEpisode(ReleaseWatch.FindStringSubmatch(event.Message()))
+
+	if releaseWatch.MatchString(e.Message()) == true {
+		newEpisode(releaseWatch.FindStringSubmatch(e.Message()))
+	}
+}
+
+//irc client onWelcome handler function
+func ircWelcomeHandler(e *ircevent.Event) {
+	for _, channel := range ircCfg.Channels {
+		ircConn.Join(channel)
 	}
 }
 
@@ -49,20 +68,25 @@ func IrcMsgHandler(event *irc.Event) {
 // 1 = anime name
 // 2 = episode (1-3 length integers only)
 // 3 = resolution (1080p | 720p | 480p)
-func newEpisode(args []string) {
+func newEpisode(args []string) { //TODO
 	epnum, _ := strconv.Atoi(args[2])
-	episode := Anime{Name:args[1], Episode:epnum}
+	episode := anime{Name: args[1], Episode: epnum}
 	if episode.Exists() {
 		if episode.NewEpisode() {
 			episode.UpdateEp()
 			if len(episode.Subs) > 0 {
-				resultstr := fmt.Sprintf("**New episode of %s released - Episode %d**\n", episode.Name, episode.Episode)
+				resultstr := fmt.Sprintf(
+					"**New episode of %s released - Episode %d**\n",
+					episode.Name, episode.Episode)
 				for _, person := range episode.Subs {
 					resultstr += fmt.Sprintf("<@%s>", person)
 				}
 				resultstr += fmt.Sprintf("\nDownload at %s\n", episode.Href)
-				resultstr += fmt.Sprintf("To subscribe to this anime type \"!sub %s\"", episode.Id)
-				discord.ChannelMessageSend(DISCORD_ANIME, resultstr)
+				resultstr += fmt.Sprintf(
+					"To subscribe to this anime type \"!sub %s\"",
+					episode.ID)
+
+				discordConn.ChannelMessageSend(discordCfg.ChannelAnime, resultstr)
 			}
 		}
 	} else {

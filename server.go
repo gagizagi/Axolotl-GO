@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"net/http"
-	"sort"
 	"html/template"
+	"log"
+	"net/http"
+	"os"
+	"sort"
+
 	"github.com/eknkc/amber"
 )
 
@@ -14,34 +16,41 @@ var templateMap map[string]*template.Template
 
 //initialization of the template map
 func init() {
-	DefaultOptions := amber.Options{false, false}
-	DefaultDirOptions := amber.DirOptions{".amber", true}
-	templateMap, _ = amber.CompileDir("views", DefaultDirOptions, DefaultOptions)
+	templateMap, _ = amber.CompileDir("views",
+		amber.DirOptions{".amber", true},
+		amber.Options{false, false})
 }
 
 //complete web server function
-func Web_server() {
-	http.HandleFunc("/anime", AnimeHandler)
-	http.HandleFunc("/static/", StaticHandler)
-	
+func webServer() {
+	//Sets path handler funcions
+	http.HandleFunc("/anime", animeHandler)
+	http.HandleFunc("/static/", staticHandler)
+
+	//Sets url and port
 	bind := fmt.Sprintf("%s:%s", "127.0.0.1", "422")
-	if os.Getenv("OPENSHIFT_GO_IP") != "" && os.Getenv("OPENSHIFT_GO_PORT") != ""{
-		bind = fmt.Sprintf("%s:%s", os.Getenv("OPENSHIFT_GO_IP"), os.Getenv("OPENSHIFT_GO_PORT"))
+	if os.Getenv("OPENSHIFT_GO_IP") != "" &&
+		os.Getenv("OPENSHIFT_GO_PORT") != "" {
+		bind = fmt.Sprintf("%s:%s", os.Getenv("OPENSHIFT_GO_IP"),
+			os.Getenv("OPENSHIFT_GO_PORT"))
 	}
-	fmt.Printf("Web server listening on %s\n", bind)
+
+	//Listen and sert to port
+	log.Printf("Web server listening on %s", bind)
 	err := http.ListenAndServe(bind, nil)
 	if err != nil {
-		panic(err)
+		log.Fatal("webServer() => ListenAndServer() error:\t", err)
 	}
 }
 
 // /anime path handler
-func AnimeHandler(w http.ResponseWriter, r *http.Request) {
-	data := Get_anime_list()
+func animeHandler(w http.ResponseWriter, r *http.Request) {
+	data := getAnimeList()
 	sort.Sort(data)
 	templateMap["aList"].Execute(w, data)
 }
+
 // /static/* file server
-func StaticHandler(w http.ResponseWriter, r *http.Request) {
+func staticHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, r.URL.Path[1:])
 }

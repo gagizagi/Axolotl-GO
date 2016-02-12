@@ -2,28 +2,31 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"log"
 	"math/rand"
+	"time"
+
 	owm "github.com/briandowns/openweathermap"
 )
 
-var startTime time.Time
+var botStartTime time.Time
 
 func init() {
 	rand.Seed(time.Now().Unix())
-	startTime = time.Now()
+	botStartTime = time.Now()
 }
 
-func GetUptime() (string) {
-	return time.Now().Sub(startTime).String()
+func getUptime() string {
+	return time.Now().Sub(botStartTime).String()
 }
 
-func GetWeather(location string) (result string) {
+func getWeather(location string) (result string) {
 	w, err := owm.NewCurrent("C", "en")
 	if err != nil {
-		fmt.Println(err)
+		log.Print("getWeather() => newCurrent() error:\n", err)
+		return "error"
 	}
-	
+
 	w.CurrentByName(location)
 	result += fmt.Sprintf("***Weather for %s (%s)***\n\n", w.Name, w.Sys.Country)
 	result += fmt.Sprintf("```Temperature: %.1f°C\n", w.Main.Temp)
@@ -33,6 +36,5 @@ func GetWeather(location string) (result string) {
 	}
 	result += fmt.Sprintf("Wind speed: %.1fm/s\n", w.Wind.Speed)
 	result += fmt.Sprintf("Clouds: %d%%```", w.Clouds.All)
-
 	return
 }
