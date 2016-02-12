@@ -7,7 +7,7 @@ import (
 
 var ircClient = ircConfig{
 	Server:   "irc.rizon.net:6667",
-	Channels: []string{"#422" /*, "#HORRIBLESUBS"*/},
+	Channels: []string{"#422", "#HORRIBLESUBS"},
 	Username: "Axolotl",
 	Nickname: "Axolotl",
 	Verbose:  false,
