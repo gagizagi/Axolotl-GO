@@ -1,35 +1,42 @@
 package main
 
-import(
+import (
+	"log"
 	"os"
-	"fmt"
+
 	"gopkg.in/mgo.v2"
 )
 
-var DBsession *mgo.Session
+//DBanimeList is a database collection "animeList"
 var DBanimeList *mgo.Collection
 
-func init() {
-	var err error
+func dbConn() {
+	//Set url
 	url := "localhost"
 	if os.Getenv("OPENSHIFT_MONGODB_DB_URL") != "" {
 		url = os.Getenv("OPENSHIFT_MONGODB_DB_URL")
 	}
 
-	DBsession, err = mgo.Dial(url)
+	//Connect to url
+	dbSession, err := mgo.Dial(url)
 	if err != nil {
-		panic(err)
+		log.Fatal("dbConn() => Dial() error:\t", err)
 	}
 
-	if os.Getenv("OPENSHIFT_MONGODB_DB_USERNAME") != "" && os.Getenv("OPENSHIFT_MONGODB_DB_PASSWORD") != "" {
+	//authenticate
+	if os.Getenv("OPENSHIFT_MONGODB_DB_USERNAME") != "" &&
+		os.Getenv("OPENSHIFT_MONGODB_DB_PASSWORD") != "" {
 		creds := mgo.Credential{
-			Username:os.Getenv("OPENSHIFT_MONGODB_DB_USERNAME"),
-			Password:os.Getenv("OPENSHIFT_MONGODB_DB_PASSWORD")}
-		
-		DBsession.Login(&creds)
+			Username: os.Getenv("OPENSHIFT_MONGODB_DB_USERNAME"),
+			Password: os.Getenv("OPENSHIFT_MONGODB_DB_PASSWORD")}
+
+		dbSession.Login(&creds)
 	}
-	DBsession.SetMode(mgo.Monotonic, true)
-	
-	DBanimeList = DBsession.DB("axolotl").C("animeList")
-	fmt.Printf("Connected to MongoDB on %s\n", url)
+	dbSession.SetMode(mgo.Monotonic, true)
+
+	//Set collections
+	DBanimeList = dbSession.DB("axolotl").C("animeList")
+
+	//Success
+	log.Printf("Connected to MongoDB on %s\n", url)
 }

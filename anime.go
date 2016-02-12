@@ -1,119 +1,143 @@
 package main
 
-import(
-	"strings"
+import (
 	"fmt"
-	"time"
+	"log"
 	"math/rand"
-	"gopkg.in/mgo.v2/bson"
+	"strings"
+	"time"
+
 	"github.com/PuerkitoBio/goquery"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
-type AnimeList []Anime
+type animeList []anime
 
-type Anime struct {
-	Id 			string 		`bson:"id"`//done
-	Name 		string 		`bson:"name"`//done
-	Href 		string 		`bson:"href"`//done
-	Episode 	int 		`bson:"ep"`//done
-	Subs 		[]string 	`bson:"subs"`//done
-	LastUpdate 	time.Time 	`bson:"lastUpdate"`//done
+type anime struct {
+	ID         string    `bson:"id"`
+	Name       string    `bson:"name"`
+	Href       string    `bson:"href"`
+	Episode    int       `bson:"ep"`
+	Subs       []string  `bson:"subs"`
+	LastUpdate time.Time `bson:"lastUpdate"`
 }
 
 //Gets every anime in animeList db and returns it as AnimeList
-func Get_anime_list() (AnimeList) {
-	var result AnimeList
+func getAnimeList() (result animeList) {
 	err := DBanimeList.Find(nil).Sort("lastUpdate").All(&result)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("getAnimeList() => Find() error:\t", err)
 	}
-	
-	return result
+	return
 }
 
 //db maintanance called every interval time.Duration
 //deletes entries over 22 days old
 //gets urls for entries that don't have them
-func Maintain_anime_list(interval time.Duration) {
+func maintainAnimeList(interval time.Duration) {
 	const LIMIT = 22 * 24 * time.Hour
-
 	for _ = range time.Tick(interval) {
-		animeList := Get_anime_list()
+		animeList := getAnimeList()
 		now := time.Now()
-		
 		for _, a := range animeList {
 			if len(a.Href) < 5 {
 				a.GetHref()
 			}
-			
 			if now.Sub(a.LastUpdate) > LIMIT {
 				a.Remove()
 			}
 		}
-		fmt.Println("AUTO-MAINTANANCE: animeList updated at", now)
+		log.Println("AUTO-MAINTANANCE: animeList updated.")
 	}
 }
 
 //Inserts a new anime entry to db
 //Generates unique id if it doesent exist
-func (a *Anime) Insert() {
-	if a.Id == "" {
-		a.GenId()
+func (a *anime) Insert() {
+	if a.ID == "" {
+		a.GenID()
 	}
 	a.LastUpdate = time.Now()
 	DBanimeList.Insert(a)
 }
 
 //Remove anime from db by Anime.Name or Anime.Id
-func (a Anime) Remove() {
+func (a anime) Remove() {
 	if a.Name != "" {
-		DBanimeList.Remove(bson.M{"name":a.Name})
-	} else if a.Id != "" {
-		DBanimeList.Remove(bson.M{"id":a.Id})	
+		DBanimeList.Remove(bson.M{"name": a.Name})
+	} else if a.ID != "" {
+		DBanimeList.Remove(bson.M{"id": a.ID})
 	}
 }
 
 //Updates the db entry with up-to-date episode number
-func (a *Anime) UpdateEp() {
+func (a *anime) UpdateEp() {
 	updateQuery := bson.M{
-		"$set":bson.M{
-			"ep":a.Episode,
-			"lastUpdate":time.Now(),
+		"$set": bson.M{
+			"ep":         a.Episode,
+			"lastUpdate": time.Now(),
 		},
 	}
-	DBanimeList.Update(bson.M{"name":a.Name}, updateQuery)
+	change := mgo.Change{
+		Update:    updateQuery,
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	DBanimeList.Find(bson.M{"name": a.Name}).Apply(change, a)
 }
 
-//Adds new sub Name to the db entry of Anime.Id 
-func (a Anime) AddSub(sub string) {
-	updateQuery := bson.M{"$addToSet":bson.M{"subs":sub}}
-	DBanimeList.Update(bson.M{"id":a.Id}, updateQuery)
+//Adds new sub Name to the db entry of Anime.Id
+func (a *anime) AddSub(sub string) {
+	updateQuery := bson.M{
+		"$addToSet": bson.M{
+			"subs": sub,
+		},
+	}
+	change := mgo.Change{
+		Update:    updateQuery,
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	DBanimeList.Find(bson.M{"id": a.ID}).Apply(change, a)
 }
 
 //Removes the sub from the db entry of Anime.Id
-func (a Anime) RemoveSub(sub string) {
-	updateQuery := bson.M{"$pull":bson.M{"subs":sub}}
-	DBanimeList.Update(bson.M{"id":a.Id}, updateQuery)
+func (a *anime) RemoveSub(sub string) {
+	updateQuery := bson.M{
+		"$pull": bson.M{
+			"subs": sub,
+		},
+	}
+	change := mgo.Change{
+		Update:    updateQuery,
+		Upsert:    false,
+		Remove:    false,
+		ReturnNew: true,
+	}
+	DBanimeList.Find(bson.M{"id": a.ID}).Apply(change, a)
 }
 
 //Generates a unique 3char alphanumeric ID
 //Not case sensitive
-func (a *Anime) GenId() {
-	var id,byteList string
+func (a *anime) GenID() {
+	var id, byteList string
 	byteList = "0123456789abcdefghijklmnopqrstuvwxyz"
 	for i := 0; i < 3; i++ {
 		id += string(byteList[rand.Intn(len(byteList))])
 	}
-	
-	if n, _ := DBanimeList.Find(bson.M{"id":id}).Count(); n == 0 {
-		a.Id = id
-	}else{
-		a.GenId()
+
+	if n, _ := DBanimeList.Find(bson.M{"id": id}).Count(); n == 0 {
+		a.ID = id
+	} else {
+		a.GenID()
 	}
 }
 
 //Gets href for Anime.Name
-func (a *Anime) GetHref() {
+func (a *anime) GetHref() {
 	doc, err := goquery.NewDocument("http://horriblesubs.info/current-season/")
 	if err != nil {
 		fmt.Println(err)
@@ -121,16 +145,15 @@ func (a *Anime) GetHref() {
 		doc.Find(".ind-show.linkful").Each(func(i int, s *goquery.Selection) {
 			name, _ := s.Find("a").Attr("title")
 			url, _ := s.Find("a").Attr("href")
-			fmt.Printf("Checking '%s' and '%s'\n", a.Name, name)
 			if strings.ToLower(name) == strings.ToLower(a.Name) {
-				newHref := fmt.Sprintf("http://horriblesubs.info%s",url)
+				newHref := fmt.Sprintf("http://horriblesubs.info%s", url)
 				updateQuery := bson.M{
-					"$set":bson.M{
-						"href":newHref,
-						"lastUpdate":time.Now(),
+					"$set": bson.M{
+						"href":       newHref,
+						"lastUpdate": time.Now(),
 					},
 				}
-				DBanimeList.Update(bson.M{"name":a.Name}, updateQuery)
+				DBanimeList.Update(bson.M{"name": a.Name}, updateQuery)
 				return
 			}
 		})
@@ -140,48 +163,46 @@ func (a *Anime) GetHref() {
 //Checks if there is already an entry in db
 //with the same id OR the same name
 //returns true if it already exists
-func (a Anime) Exists() (bool) {
+func (a anime) Exists() bool {
 	query := bson.M{
 		"$or": []interface{}{
-			bson.M{"id":a.Id},
-			bson.M{"name":a.Name},
+			bson.M{"id": a.ID},
+			bson.M{"name": a.Name},
 		},
 	}
 	if n, _ := DBanimeList.Find(query).Count(); n == 0 {
 		return false
-	} else {
-		return true
 	}
+	return true
 }
 
 //Checks if episode # already exists in db
-//Returns true if episode in db is outdated and 
+//Returns true if episode in db is outdated and
 //needs to be updated and false if db is already
 //up to date
-func (a Anime) NewEpisode() (bool) {
+func (a anime) NewEpisode() bool {
 	query := bson.M{
-		"name":a.Name,
-		"ep":bson.M{
-			"$lt":a.Episode,
+		"name": a.Name,
+		"ep": bson.M{
+			"$lt": a.Episode,
 		},
 	}
-	
+
 	if n, _ := DBanimeList.Find(query).Count(); n == 0 {
 		return false
-	} else {
-		return true
 	}
+	return true
 }
 
 //returns length of AnimeList
 //used for sort interface
-func (a AnimeList) Len() (int) {
+func (a animeList) Len() int {
 	return len(a)
 }
 
 //Checks if index i should sort before index j
 //used for sort interface
-func (a AnimeList) Less(i, j int) (bool) {
+func (a animeList) Less(i, j int) bool {
 	if len(a[i].Subs) > len(a[j].Subs) {
 		return true
 	}
@@ -190,6 +211,6 @@ func (a AnimeList) Less(i, j int) (bool) {
 
 //Swaps the values of i and j indexes
 //used for sort interface
-func (a AnimeList) Swap(i, j int) {
+func (a animeList) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }

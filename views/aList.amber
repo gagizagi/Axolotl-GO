@@ -15,7 +15,7 @@ block aList
 		tbody
 			each $val in $
 				tr
-					td #{$val.Id}
+					td #{$val.ID}
 					td #{$val.Name}
 					td #{$val.Episode}
 					td #{len($val.Subs)}
