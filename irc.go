@@ -68,7 +68,7 @@ func ircWelcomeHandler(e *ircevent.Event) {
 // 1 = anime name
 // 2 = episode (1-3 length integers only)
 // 3 = resolution (1080p | 720p | 480p)
-func newEpisode(args []string) { //TODO
+func newEpisode(args []string) {
 	epnum, _ := strconv.Atoi(args[2])
 	episode := anime{Name: args[1], Episode: epnum}
 	if episode.Exists() {
