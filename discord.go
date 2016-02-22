@@ -48,8 +48,8 @@ func discordConnStart(c *discordConfig) {
 	}
 
 	discordConn.Debug = c.Debug
-	discordConn.OnMessageCreate = discordMsgHandler
-	discordConn.OnReady = discordReadyHandler
+	discordConn.AddHandler(discordMsgHandler)
+	discordConn.AddHandler(discordReadyHandler)
 	discordConn.Open()
 }
 
@@ -68,7 +68,7 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 }
 
 //discord incomming message handler
-func discordMsgHandler(s *discordgo.Session, m *discordgo.Message) {
+func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	boss := m.Author.ID == discordCfg.Boss
 	relevant := relevantRegex.MatchString(m.Content)
 
