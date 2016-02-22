@@ -1,3 +1,7 @@
 body {
 	background-image: url("bg.png")
 }
+
+#search {
+	background: rgba(0,0,0,0.1)
+}
