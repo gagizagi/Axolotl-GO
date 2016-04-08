@@ -56,8 +56,7 @@ func maintainAnimeList() {
 	now := time.Now()
 	for _, a := range animeList {
 		if len(a.Href) < 5 {
-			log.Println("Getting href for ", a.Name)
-			a.GetHref()
+			updates += a.GetHref()
 		}
 		if now.Sub(a.LastUpdate) > LIMIT {
 			a.Remove()
@@ -78,12 +77,16 @@ func (a *anime) Insert() {
 }
 
 //Remove anime from db by Anime.Name or Anime.Id
-func (a anime) Remove() {
+func (a anime) Remove() (success int) {
+	success = 0
 	if a.Name != "" {
 		DBanimeList.Remove(bson.M{"name": a.Name})
+		success = 1
 	} else if a.ID != "" {
 		DBanimeList.Remove(bson.M{"id": a.ID})
+		success = 1
 	}
+	return
 }
 
 //Updates the db entry with up-to-date episode number
@@ -152,7 +155,8 @@ func (a *anime) GenID() {
 }
 
 //Gets href for Anime.Name
-func (a *anime) GetHref() {
+func (a *anime) GetHref() (success int) {
+	success = 0
 	scrapper, target :=
 		"http://scraper-422.rhcloud.com/?href=",
 		"http://horriblesubs.info/current-season/"
@@ -162,9 +166,7 @@ func (a *anime) GetHref() {
 	} else {
 		doc.Find(".ind-show.linkful").Each(func(i int, s *goquery.Selection) {
 			name, _ := s.Find("a").Attr("title")
-			fmt.Println(name)
 			url, _ := s.Find("a").Attr("href")
-			fmt.Println(url)
 			if strings.ToLower(name) == strings.ToLower(a.Name) {
 				newHref := fmt.Sprintf("http://horriblesubs.info%s", url)
 				updateQuery := bson.M{
@@ -174,10 +176,11 @@ func (a *anime) GetHref() {
 					},
 				}
 				DBanimeList.Update(bson.M{"name": a.Name}, updateQuery)
-				return
+				success = 1
 			}
 		})
 	}
+	return
 }
 
 //Checks if there is already an entry in db
