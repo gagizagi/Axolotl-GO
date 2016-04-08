@@ -23,6 +23,9 @@ type anime struct {
 	LastUpdate time.Time `bson:"lastUpdate"`
 }
 
+//LIMIT is a time constant for 22 Days (for removal of outdated db entries)
+const LIMIT = 22 * 24 * time.Hour
+
 //Gets every anime in animeList db and returns it as AnimeList type
 func getAnimeList() (result animeList) {
 	err := DBanimeList.Find(nil).Sort("lastUpdate").All(&result)
@@ -32,24 +35,36 @@ func getAnimeList() (result animeList) {
 	return
 }
 
-//db maintanance called every interval time.Duration
-//deletes entries over 22 days old
-//gets urls for entries that don't have them
-func maintainAnimeList(interval time.Duration) {
-	const LIMIT = 22 * 24 * time.Hour
+//db maintanance process calls animeMaintanance function once on startup
+//and after every interval time.Duration
+func maintainAnimeListProcess(interval time.Duration) {
+	maintainAnimeList()
+	log.Println("Next maintanance in ", interval.String())
+
 	for _ = range time.Tick(interval) {
-		animeList := getAnimeList()
-		now := time.Now()
-		for _, a := range animeList {
-			if len(a.Href) < 5 {
-				a.GetHref()
-			}
-			if now.Sub(a.LastUpdate) > LIMIT {
-				a.Remove()
-			}
-		}
-		log.Println("AUTO-MAINTANANCE: animeList updated.")
+		maintainAnimeList()
+		log.Println("Next maintanance in ", interval.String())
 	}
+}
+
+//db maintanance function called on app startup and after interval duration
+//deletes entries over LIMIT days old
+//gets urls for entries that don't have them
+func maintainAnimeList() {
+	removals, updates := 0, 0
+	animeList := getAnimeList()
+	now := time.Now()
+	for _, a := range animeList {
+		if len(a.Href) < 5 {
+			log.Println("Getting href for ", a.Name)
+			a.GetHref()
+		}
+		if now.Sub(a.LastUpdate) > LIMIT {
+			a.Remove()
+		}
+	}
+	log.Printf("AUTO-MAINTANANCE: animeList updated! (removed: %d | updated: %d)\n",
+		removals, updates)
 }
 
 //Inserts a new anime entry to db
@@ -144,7 +159,9 @@ func (a *anime) GetHref() {
 	} else {
 		doc.Find(".ind-show.linkful").Each(func(i int, s *goquery.Selection) {
 			name, _ := s.Find("a").Attr("title")
+			fmt.Println(name)
 			url, _ := s.Find("a").Attr("href")
+			fmt.Println(url)
 			if strings.ToLower(name) == strings.ToLower(a.Name) {
 				newHref := fmt.Sprintf("http://horriblesubs.info%s", url)
 				updateQuery := bson.M{

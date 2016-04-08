@@ -24,9 +24,9 @@ var discordClient = discordConfig{
 func main() {
 	dbConn()
 
-	go ircConnStart(&ircClient)
-	go discordConnStart(&discordClient)
-	go maintainAnimeList(10 * time.Hour)
+	//go ircConnStart(&ircClient)
+	//go discordConnStart(&discordClient)
+	go maintainAnimeListProcess(2 * time.Minute)
 
 	webServer() //Last
 }
