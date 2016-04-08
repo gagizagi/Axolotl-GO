@@ -86,7 +86,9 @@ func newEpisode(args []string) {
 					"To subscribe to this anime type \"!sub %s\"",
 					episode.ID)
 
-				discordConn.ChannelMessageSend(discordCfg.ChannelAnime, resultstr)
+				for _, channel := range discordCfg.AnimeChannels {
+					discordConn.ChannelMessageSend(channel, resultstr)
+				}
 			}
 		}
 	} else {

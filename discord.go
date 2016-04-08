@@ -9,12 +9,12 @@ import (
 )
 
 type discordConfig struct {
-	Boss         string
-	Name         string
-	ChannelAnime string
-	Username     string
-	Password     string
-	Debug        bool
+	Boss          string
+	Name          string
+	AnimeChannels []string
+	Username      string
+	Password      string
+	Debug         bool
 }
 
 const (
@@ -56,11 +56,10 @@ func discordConnStart(c *discordConfig) {
 func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 	discordCfg.Name = strings.ToUpper(r.User.Username) //Sets bot name
 	for _, guild := range r.Guilds {
-		if guild.Name == "422" {
-			for _, channel := range guild.Channels {
-				if channel.Name == "anime" {
-					discordCfg.ChannelAnime = channel.ID //Sets anime channel id
-				}
+		for _, channel := range guild.Channels {
+			if channel.Name == "anime" {
+				//Sets anime channel id
+				discordCfg.AnimeChannels = append(discordCfg.AnimeChannels, channel.ID)
 			}
 		}
 	}
