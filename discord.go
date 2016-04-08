@@ -28,7 +28,7 @@ const (
 		"!unsub <id> (Unsubscribe from anime)\n" +
 		"!w <location> (Prints current weather)\n" +
 		"```\n" +
-		"Find anime list at http://axolotl-422.rhcloud.com/anime"
+		"Find anime list at http://gazzy.space/"
 )
 
 var (

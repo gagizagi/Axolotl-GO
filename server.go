@@ -24,7 +24,7 @@ func init() {
 //complete web server function
 func webServer() {
 	//Sets path handler funcions
-	http.HandleFunc("/anime", animeHandler)
+	http.HandleFunc("/", animeHandler)
 	http.HandleFunc("/static/", staticHandler)
 
 	//Sets url and port

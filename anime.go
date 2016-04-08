@@ -23,7 +23,7 @@ type anime struct {
 	LastUpdate time.Time `bson:"lastUpdate"`
 }
 
-//Gets every anime in animeList db and returns it as AnimeList
+//Gets every anime in animeList db and returns it as AnimeList type
 func getAnimeList() (result animeList) {
 	err := DBanimeList.Find(nil).Sort("lastUpdate").All(&result)
 	if err != nil {
