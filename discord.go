@@ -59,11 +59,20 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 		for _, channel := range guild.Channels {
 			if channel.Name == "anime" {
 				//Sets anime channel id
-				discordCfg.AnimeChannels = append(discordCfg.AnimeChannels, channel.ID)
+				discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, channel.ID)
 			}
 		}
 	}
 	log.Println("Connected to discord as", discordCfg.Name)
+}
+
+func appendUnique(slice []string, id string) []string {
+	for _, s := range slice {
+		if s == id {
+			return slice
+		}
+	}
+	return append(slice, id)
 }
 
 //discord incomming message handler
