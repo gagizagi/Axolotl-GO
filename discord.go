@@ -28,7 +28,7 @@ const (
 		"!unsub <id> (Unsubscribe from anime)\n" +
 		"!w <location> (Prints current weather)\n" +
 		"```\n" +
-		"Find anime list at http://gazzy.space/"
+		"Find anime list at http://gazzy.space/anime"
 )
 
 var (
