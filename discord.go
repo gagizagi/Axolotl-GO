@@ -9,12 +9,12 @@ import (
 )
 
 type discordConfig struct {
-	Boss         string
-	Name         string
-	ChannelAnime string
-	Username     string
-	Password     string
-	Debug        bool
+	Boss          string
+	Name          string
+	AnimeChannels []string
+	Username      string
+	Password      string
+	Debug         bool
 }
 
 const (
@@ -28,7 +28,7 @@ const (
 		"!unsub <id> (Unsubscribe from anime)\n" +
 		"!w <location> (Prints current weather)\n" +
 		"```\n" +
-		"Find anime list at http://axolotl-422.rhcloud.com/anime"
+		"Find anime list at http://gazzy.space/anime"
 )
 
 var (
@@ -48,27 +48,35 @@ func discordConnStart(c *discordConfig) {
 	}
 
 	discordConn.Debug = c.Debug
-	discordConn.OnMessageCreate = discordMsgHandler
-	discordConn.OnReady = discordReadyHandler
+	discordConn.AddHandler(discordMsgHandler)
+	discordConn.AddHandler(discordReadyHandler)
 	discordConn.Open()
 }
 
 func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 	discordCfg.Name = strings.ToUpper(r.User.Username) //Sets bot name
 	for _, guild := range r.Guilds {
-		if guild.Name == "422" {
-			for _, channel := range guild.Channels {
-				if channel.Name == "anime" {
-					discordCfg.ChannelAnime = channel.ID //Sets anime channel id
-				}
+		for _, channel := range guild.Channels {
+			if channel.Name == "anime" {
+				//Sets anime channel id
+				discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, channel.ID)
 			}
 		}
 	}
 	log.Println("Connected to discord as", discordCfg.Name)
 }
 
+func appendUnique(slice []string, id string) []string {
+	for _, s := range slice {
+		if s == id {
+			return slice
+		}
+	}
+	return append(slice, id)
+}
+
 //discord incomming message handler
-func discordMsgHandler(s *discordgo.Session, m *discordgo.Message) {
+func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	boss := m.Author.ID == discordCfg.Boss
 	relevant := relevantRegex.MatchString(m.Content)
 

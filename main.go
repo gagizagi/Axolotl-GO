@@ -26,7 +26,7 @@ func main() {
 
 	go ircConnStart(&ircClient)
 	go discordConnStart(&discordClient)
-	go maintainAnimeList(10 * time.Hour)
+	go maintainAnimeListProcess(10 * time.Hour)
 
 	webServer() //Last
 }

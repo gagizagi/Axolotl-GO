@@ -17,14 +17,14 @@ var templateMap map[string]*template.Template
 //initialization of the template map
 func init() {
 	templateMap, _ = amber.CompileDir("views",
-		amber.DirOptions{".amber", true},
-		amber.Options{false, false})
+		amber.DirOptions{Ext: ".amber", Recursive: true},
+		amber.Options{PrettyPrint: false, LineNumbers: false})
 }
 
 //complete web server function
 func webServer() {
 	//Sets path handler funcions
-	http.HandleFunc("/anime", animeHandler)
+	http.HandleFunc("/", animeHandler)
 	http.HandleFunc("/static/", staticHandler)
 
 	//Sets url and port
