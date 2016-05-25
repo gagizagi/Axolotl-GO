@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"strings"
 	"time"
-	//hi
+
 	"github.com/PuerkitoBio/goquery"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
