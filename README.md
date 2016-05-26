@@ -30,3 +30,13 @@ Discord bot utility features such as weather, Path of exile utilities and more.
 ###### Anime updates - HorribleSubs
 * <http://horriblesubs.info/>
 * \#HorribleSubs on irc.rizon.net
+
+###### Discord free VoIP - <https://discordapp.com/>
+
+###### Discord GO package - [discordgo](https://github.com/bwmarrin/discordgo#discordgo-) by [bwmarrin](https://github.com/bwmarrin)
+
+###### Weather API - <http://openweathermap.org/>
+
+###### Openweathermap GO package - [github.com/briandowns/openweathermap](https://github.com/briandowns/openweathermap)
+
+###### IRC GO package - [github.com/thoj/go-ircevent](https://github.com/thoj/go-ircevent)
