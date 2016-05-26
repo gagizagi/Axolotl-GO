@@ -8,17 +8,16 @@ import (
 var ircClient = ircConfig{
 	Server:   "irc.rizon.net:6667",
 	Channels: []string{"#422", "#HORRIBLESUBS"},
-	Username: "Axolotl",
-	Nickname: "Axolotl",
+	Username: "Axolotl-Go",
+	Nickname: "Axolotl-Go",
 	Verbose:  false,
 	Debug:    false,
 }
 
 var discordClient = discordConfig{
-	Boss:     "110846867473973248",
-	Username: os.Getenv("DISCORD_USERNAME"),
-	Password: os.Getenv("DISCORD_PASSWORD"),
-	Debug:    false,
+	Boss:  "110846867473973248",
+	Token: os.Getenv("DISCORD_TOKEN"),
+	Debug: false,
 }
 
 func main() {

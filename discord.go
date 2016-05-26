@@ -12,8 +12,7 @@ type discordConfig struct {
 	Boss          string
 	Name          string
 	AnimeChannels []string
-	Username      string
-	Password      string
+	Token         string
 	Debug         bool
 }
 
@@ -42,7 +41,7 @@ func discordConnStart(c *discordConfig) {
 	discordCfg = c
 
 	var err error
-	discordConn, err = discordgo.New(c.Username, c.Password)
+	discordConn, err = discordgo.New(c.Token)
 	if err != nil {
 		log.Fatal("discordConnStart() => New() error:\t", err)
 	}
