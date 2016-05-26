@@ -1,18 +1,18 @@
-![alt text](https://cdn.discordapp.com/avatars/185177851799011329/70c6e3e9a5763bed9fdf36510e81273a.jpg "Axolotl so moe")
-
 # Axolotl-GO
 
+![alt text](https://cdn.discordapp.com/avatars/185177851799011329/70c6e3e9a5763bed9fdf36510e81273a.jpg "Axolotl so moe")
+
+### Introduction
 Discord and IRC bot focused primarily on providing current season airing anime episode
 updates as discord @mentions, but also providing an ever-increasing list of
 Discord bot utility features such as weather, Path of exile utilities and more.
-###### Update sources:
-* <http://horriblesubs.info/>
-* \#HorribleSubs on irc.rizon.net
 
 ### Navigation
-* [Intro & sources](#axolotl-go)
+* [TOP](#axolotl-go)
+* [Introduction](#introduction)
 * [Navigation](#navigation)
-* [Bot commands](#)
+* [Bot commands](#bot-commands)
+* [Credits](#credits)
 
 ### Bot Commands
 
@@ -24,3 +24,9 @@ Discord bot utility features such as weather, Path of exile utilities and more.
 !unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here](http://axolotl-422.rhcloud.com/)
 !w *location*|Returns current weather for location in Discord channel|!w Ljubljana|Will make a best guess if location is unknown
 !p *string*|Sets the game bot is "playing"|!p minecraft|Admin only
+
+### Credits
+
+###### Anime updates - HorribleSubs
+* <http://horriblesubs.info/>
+* \#HorribleSubs on irc.rizon.net
