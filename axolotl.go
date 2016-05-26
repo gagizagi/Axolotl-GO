@@ -15,7 +15,7 @@ var ircClient = ircConfig{
 }
 
 var discordClient = discordConfig{
-	Boss:  "110846867473973248",
+	Boss:  os.Getenv("DISCORD_BOSS"),
 	Token: os.Getenv("DISCORD_TOKEN"),
 	Debug: false,
 }
