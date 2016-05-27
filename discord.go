@@ -54,8 +54,12 @@ func discordConnStart(c *discordConfig) {
 
 func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 	discordCfg.Name = strings.ToUpper(r.User.Username) //Sets bot name
+	//Iterates through guilds
 	for _, guild := range r.Guilds {
-		for _, channel := range guild.Channels {
+		//Gets a list of channels for this guild
+		channels, _ := s.GuildChannels(guild.ID)
+		//Iterates through a list of channels for this guild
+		for _, channel := range channels {
 			if channel.Name == "anime" {
 				//Sets anime channel id
 				discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, channel.ID)
