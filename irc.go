@@ -13,7 +13,6 @@ import (
 type ircConfig struct {
 	Server   string
 	Channels []string
-	Username string
 	Nickname string
 	Verbose  bool
 	Debug    bool
@@ -31,7 +30,7 @@ var (
 func ircConnStart(c *ircConfig) {
 	ircCfg = c
 
-	ircConn = ircevent.IRC(c.Username, c.Nickname)
+	ircConn = ircevent.IRC(c.Nickname, c.Nickname)
 	ircConn.Debug = c.Debug
 	ircConn.VerboseCallbackHandler = c.Verbose
 	ircConn.AddCallback("PRIVMSG", ircMsgHandler)
@@ -52,6 +51,9 @@ func ircMsgHandler(e *ircevent.Event) {
 
 	if releaseWatch.MatchString(e.Message()) == true {
 		newEpisode(releaseWatch.FindStringSubmatch(e.Message()))
+	} else if e.Arguments[0] == ircClient.Nickname && e.Nick != ircClient.Nickname {
+		ircConn.Privmsg(e.Nick, "Discord BOT - https://github.com/gagizagi/Axolotl-GO")
+		ircConn.Privmsg(e.Nick, "Current uptime is "+getUptime())
 	}
 }
 
