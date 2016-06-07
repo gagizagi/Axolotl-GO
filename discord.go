@@ -161,6 +161,7 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		//!P string
 		//Sets the 'currently playing' state of the bot
+		//will only work for admin of the bot
 		case "!P":
 			if boss {
 				if len(args) > 1 {
@@ -173,6 +174,18 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				} else {
 					discord.UpdateStatus(0, "")
 				}
+			}
+
+		//!INFO [string]
+		//Can optionally include bots name as second argument
+		//Lists bot usage and general information
+		case "!INFO":
+			if len(args) > 1 {
+				if strings.ToUpper(args[1]) == discordCfg.Name {
+					s.ChannelMessageSend(m.ChannelID, getInfo())
+				}
+			} else {
+				s.ChannelMessageSend(m.ChannelID, getInfo())
 			}
 		}
 	}
