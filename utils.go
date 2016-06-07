@@ -9,7 +9,11 @@ import (
 	owm "github.com/briandowns/openweathermap"
 )
 
-var botStartTime time.Time
+var (
+	botStartTime time.Time
+	botResponses int
+	botMessages  int
+)
 
 func init() {
 	rand.Seed(time.Now().Unix())
@@ -36,6 +40,20 @@ func getWeather(location string) (result string) {
 	}
 	result += fmt.Sprintf("Wind speed: %.1fm/s\n", w.Wind.Speed)
 	result += fmt.Sprintf("Clouds: %d%%```", w.Clouds.All)
+	return
+}
+
+//getInfo returns the bot infromation as a discord formated string
+func getInfo() (result string) {
+	result += "```"
+	result += fmt.Sprintf("Name: %s\n", discordCfg.Name)
+	result += fmt.Sprintf("Uptime: %s\n", getUptime())
+	result += fmt.Sprintf("Guilds: %d\n", len(discordCfg.Guilds))
+	result += fmt.Sprintf("Anime channels: %d\n", len(discordCfg.AnimeChannels))
+	result += fmt.Sprintf("Messages read: %d\n", botMessages)
+	result += fmt.Sprintf("Message responses: %d\n", botResponses)
+	result += "```"
+
 	return
 }
 

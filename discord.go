@@ -13,6 +13,7 @@ type discordConfig struct {
 	Boss          string
 	Name          string
 	AnimeChannels []string
+	Guilds        []string
 	Token         string
 	Debug         bool
 }
@@ -67,6 +68,7 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 
 	//Iterates through guilds
 	for _, guild := range r.Guilds {
+		discordCfg.Guilds = appendUnique(discordCfg.Guilds, guild.Name)
 		//Gets a list of channels for this guild
 		channels, _ := s.GuildChannels(guild.ID)
 		//Iterates through a list of channels for this guild
@@ -86,6 +88,7 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 
 //discordMsgHandler is a handler function for incomming discord messages
 func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	botMessages++
 	//Check if author is admin
 	boss := m.Author.ID == discordCfg.Boss
 	//Check if message is relevant to the bot
@@ -94,6 +97,7 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	//If message is relevant process it otherwise leave this function
 	if relevant {
+		botResponses++
 		args := strings.Fields(m.Content)
 		switch strings.ToUpper(args[0]) {
 
