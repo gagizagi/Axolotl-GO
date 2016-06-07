@@ -89,7 +89,7 @@ func newEpisode(args []string) {
 					episode.ID)
 
 				for _, channel := range discordCfg.AnimeChannels {
-					discordConn.ChannelMessageSend(channel, resultstr)
+					discord.ChannelMessageSend(channel, resultstr)
 				}
 			}
 		}

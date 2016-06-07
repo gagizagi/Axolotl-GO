@@ -16,7 +16,9 @@ type discordConfig struct {
 	Debug         bool
 }
 
+//Declare constants
 const (
+	//Help string lists all discord chat commands for this bot
 	discordHelp string = "***LIST OF BOT COMMANDS***\n" +
 		"Fields in [] are optional\n" +
 		"Fields in <> are mandatory\n\n" +
@@ -30,26 +32,27 @@ const (
 		"Find anime list at http://gazzy.space/anime"
 )
 
+//Declare variables
 var (
-	discordConn   *discordgo.Session           //Discord client
+	discord       *discordgo.Session           //Discord client
 	discordCfg    *discordConfig               //Discord options
 	relevantRegex = regexp.MustCompile(`^!\w`) //Discord regex msg parser
 )
 
 //Starts discord client
-func discordConnStart(c *discordConfig) {
+func discordStart(c *discordConfig) {
 	discordCfg = c
 
 	var err error
-	discordConn, err = discordgo.New(c.Token)
+	discord, err = discordgo.New(c.Token)
 	if err != nil {
 		log.Fatal("discordConnStart() => New() error:\t", err)
 	}
 
-	discordConn.Debug = c.Debug
-	discordConn.AddHandler(discordMsgHandler)
-	discordConn.AddHandler(discordReadyHandler)
-	discordConn.Open()
+	discord.Debug = c.Debug
+	discord.AddHandler(discordMsgHandler)
+	discord.AddHandler(discordReadyHandler)
+	discord.Open()
 }
 
 func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
@@ -141,9 +144,9 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 						game += args[i] + " "
 					}
 					game = game[:len(game)-1]
-					discordConn.UpdateStatus(0, game)
+					discord.UpdateStatus(0, game)
 				} else {
-					discordConn.UpdateStatus(0, "")
+					discord.UpdateStatus(0, "")
 				}
 			}
 		}
