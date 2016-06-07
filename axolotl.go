@@ -23,7 +23,7 @@ func main() {
 	dbConn()
 
 	go ircConnStart(&ircClient)
-	go discordConnStart(&discordClient)
+	go discordStart(&discordClient)
 	go maintainAnimeListProcess(10 * time.Hour)
 
 	webServer() //Last
