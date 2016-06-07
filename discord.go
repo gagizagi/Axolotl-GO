@@ -84,14 +84,21 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 	log.Println("Connected to discord as", discordCfg.Name)
 }
 
-//discord incomming message handler
+//discordMsgHandler is a handler function for incomming discord messages
 func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	//Check if author is admin
 	boss := m.Author.ID == discordCfg.Boss
+	//Check if message is relevant to the bot
+	//i.e message starts with '!' followed by a word
 	relevant := relevantRegex.MatchString(m.Content)
 
+	//If message is relevant process it otherwise leave this function
 	if relevant {
 		args := strings.Fields(m.Content)
 		switch strings.ToUpper(args[0]) {
+
+		//!HELP [string]
+		//Can optionally include bots name as second argument
 		case "!HELP":
 			if len(args) > 1 {
 				if strings.ToUpper(args[1]) == discordCfg.Name {
@@ -100,28 +107,37 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			} else {
 				s.ChannelMessageSend(m.ChannelID, discordHelp)
 			}
+
+		//!SUB anime.id
+		//anime.id is the id of the anime (string with length of 3 chars)
 		case "!SUB":
 			if len(args) >= 2 {
-				anime := anime{ID: strings.ToLower(args[1])}
-				if anime.Exists() {
-					anime.AddSub(m.Author.ID)
+				newAnime := anime{ID: strings.ToLower(args[1])}
+				if newAnime.Exists() {
+					newAnime.AddSub(m.Author.ID)
 					s.ChannelMessageSend(m.ChannelID,
-						"Successfully subscribed to "+anime.Name)
+						"Successfully subscribed to "+newAnime.Name)
 				} else {
 					s.ChannelMessageSend(m.ChannelID, "Invalid ID")
 				}
 			}
+
+		//!UNSUB anime.id
+		//anime.id is the id of the anime (string with length of 3 chars)
 		case "!UNSUB":
 			if len(args) >= 2 {
-				anime := anime{ID: strings.ToLower(args[1])}
-				if anime.Exists() {
-					anime.RemoveSub(m.Author.ID)
+				newAnime := anime{ID: strings.ToLower(args[1])}
+				if newAnime.Exists() {
+					newAnime.RemoveSub(m.Author.ID)
 					s.ChannelMessageSend(m.ChannelID,
-						"Successfully unsubscribed from "+anime.Name)
+						"Successfully unsubscribed from "+newAnime.Name)
 				} else {
 					s.ChannelMessageSend(m.ChannelID, "Invalid ID")
 				}
 			}
+
+		//!UPTIME [string]
+		//Can optionally include bots name as second argument
 		case "!UPTIME":
 			if len(args) > 1 {
 				if strings.ToUpper(args[1]) == discordCfg.Name {
@@ -130,6 +146,9 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			} else {
 				s.ChannelMessageSend(m.ChannelID, "Current uptime is "+getUptime())
 			}
+
+		//!W string
+		//Looks up weather at the the location string
 		case "!W":
 			if len(args) > 1 {
 				var location string
@@ -139,6 +158,9 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				location = location[:len(location)-1]
 				s.ChannelMessageSend(m.ChannelID, getWeather(location))
 			}
+
+		//!P string
+		//Sets the 'currently playing' state of the bot
 		case "!P":
 			if boss {
 				if len(args) > 1 {
