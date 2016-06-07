@@ -52,9 +52,9 @@ func maintainAnimeListProcess(interval time.Duration) {
 //gets urls for entries that don't have them
 func maintainAnimeList() {
 	removals, updates := 0, 0
-	animeList := getAnimeList()
+	newAnimeList := getAnimeList()
 	now := time.Now()
-	for _, a := range animeList {
+	for _, a := range newAnimeList {
 		if len(a.Href) < 5 {
 			updates += a.GetHref()
 		}
