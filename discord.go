@@ -8,6 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+//discordConfig is a struct containing user configuration for discord connection
 type discordConfig struct {
 	Boss          string
 	Name          string
@@ -39,46 +40,48 @@ var (
 	relevantRegex = regexp.MustCompile(`^!\w`) //Discord regex msg parser
 )
 
-//Starts discord client
+//Starts discord connection and sets handlers and behavior
 func discordStart(c *discordConfig) {
+	//Updates discordCfg variable with c parameter data
+	//For future use outside this function
 	discordCfg = c
 
+	//Connect to discord with token
 	var err error
 	discord, err = discordgo.New(c.Token)
 	if err != nil {
-		log.Fatal("discordConnStart() => New() error:\t", err)
+		log.Fatal("Error initializing discord in discordStart() function!\n", err)
 	}
 
+	//Set behavior & assign handlers
 	discord.Debug = c.Debug
 	discord.AddHandler(discordMsgHandler)
 	discord.AddHandler(discordReadyHandler)
-	discord.Open()
+	discord.Open() //Opens discord connection
 }
 
+//discordReadyHandler sets required data after a successful connection
 func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
-	discordCfg.Name = strings.ToUpper(r.User.Username) //Sets bot name
+	//Sets this bots name in discordCfg.Name
+	discordCfg.Name = strings.ToUpper(r.User.Username)
+
 	//Iterates through guilds
 	for _, guild := range r.Guilds {
 		//Gets a list of channels for this guild
 		channels, _ := s.GuildChannels(guild.ID)
 		//Iterates through a list of channels for this guild
 		for _, channel := range channels {
+			//If it finds a channel with name 'anime'
+			//it will add it to discordCfg.AnimeChannels array
+			//which is used when sending new episode messages in discord
 			if channel.Name == "anime" {
-				//Sets anime channel id
 				discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, channel.ID)
 			}
 		}
 	}
-	log.Println("Connected to discord as", discordCfg.Name)
-}
 
-func appendUnique(slice []string, id string) []string {
-	for _, s := range slice {
-		if s == id {
-			return slice
-		}
-	}
-	return append(slice, id)
+	//Logs successful connection to discord was established
+	log.Println("Connected to discord as", discordCfg.Name)
 }
 
 //discord incomming message handler

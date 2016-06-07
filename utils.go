@@ -38,3 +38,14 @@ func getWeather(location string) (result string) {
 	result += fmt.Sprintf("Clouds: %d%%```", w.Clouds.All)
 	return
 }
+
+//appendUnique is a function for appending a string to string array
+//only appends the string if it doesn't already exsist in the array
+func appendUnique(slice []string, id string) []string {
+	for _, s := range slice {
+		if s == id {
+			return slice
+		}
+	}
+	return append(slice, id)
+}
