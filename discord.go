@@ -30,6 +30,7 @@ const (
 		"!sub <id> (Subscribe to anime)\n" +
 		"!unsub <id> (Unsubscribe from anime)\n" +
 		"!w <location> (Prints current weather)\n" +
+		"!info [bot] (Prints bot information)" +
 		"```\n" +
 		"Find anime list at http://gazzy.space/anime"
 )
@@ -190,6 +191,23 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 			} else {
 				s.ChannelMessageSend(m.ChannelID, getInfo())
+			}
+
+		//!GUILDS [string]
+		//Can optionally include bots name as second argument
+		//Lists all the guilds this bot is a part of
+		//will only work for admin of the bot
+		//FIXME
+		case "!GUILDS":
+			if boss {
+				if len(args) > 1 {
+					if strings.ToUpper(args[1]) == discordCfg.Name {
+						s.ChannelMessageSend(m.ChannelID, strings.Join(discordCfg.Guilds, ","))
+					}
+				} else {
+					log.Println(discordCfg.Guilds)
+					s.ChannelMessageSend(m.ChannelID, strings.Join(discordCfg.Guilds, ","))
+				}
 			}
 		}
 	}

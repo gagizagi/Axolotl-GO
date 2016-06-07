@@ -35,6 +35,7 @@ Discord bot utility features such as weather, Path of exile utilities and more.
 !unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here](http://axolotl-422.rhcloud.com/)
 !w *location*|Returns current weather for location in Discord channel|!w Ljubljana|Will make a best guess if location is unknown
 !p *string*|Sets the game bot is "playing"|!p minecraft|Admin only
+!info|Returns information about the bot
 
 ### Contact
 
