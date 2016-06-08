@@ -14,9 +14,10 @@ var ircClient = ircConfig{
 }
 
 var discordClient = discordConfig{
-	Boss:  os.Getenv("DISCORD_BOSS"),
-	Token: os.Getenv("DISCORD_TOKEN"),
-	Debug: false,
+	Boss:         os.Getenv("DISCORD_BOSS"),
+	Token:        os.Getenv("DISCORD_TOKEN"),
+	AnimeChannel: "anime",
+	Debug:        false,
 }
 
 func main() {
