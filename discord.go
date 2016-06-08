@@ -27,7 +27,7 @@ const (
 		"```" +
 		"!help [bot] (Lists all bot commands)\n" +
 		"!uptime [bot](Prints current bot uptime)\n" +
-		"!sub <id> (Subscribe to anime)\n" +
+		"!sub <id> (Subscribe to anime and get notified when new episode is released)\n" +
 		"!unsub <id> (Unsubscribe from anime)\n" +
 		"!w <location> (Prints current weather)\n" +
 		"!info [bot] (Prints bot information)" +
