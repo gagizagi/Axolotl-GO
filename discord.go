@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -12,6 +13,7 @@ import (
 type discordConfig struct {
 	Boss          string
 	Name          string
+	AnimeChannel  string
 	AnimeChannels []string
 	Guilds        []string
 	Token         string
@@ -59,6 +61,11 @@ func discordStart(c *discordConfig) {
 	discord.Debug = c.Debug
 	discord.AddHandler(discordMsgHandler)
 	discord.AddHandler(discordReadyHandler)
+	discord.AddHandler(discordNewGuildHandler)
+	discord.AddHandler(discordLeaveGuildHandler)
+	discord.AddHandler(discordNewChannelHandler)
+	discord.AddHandler(discordLeaveChannelHandler)
+	discord.AddHandler(discordChannelUpdateHandler)
 	discord.Open() //Opens discord connection
 }
 
@@ -69,7 +76,6 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 
 	//Iterates through guilds
 	for _, guild := range r.Guilds {
-		discordCfg.Guilds = appendUnique(discordCfg.Guilds, guild.Name)
 		//Gets a list of channels for this guild
 		channels, _ := s.GuildChannels(guild.ID)
 		//Iterates through a list of channels for this guild
@@ -77,7 +83,7 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 			//If it finds a channel with name 'anime'
 			//it will add it to discordCfg.AnimeChannels array
 			//which is used when sending new episode messages in discord
-			if channel.Name == "anime" {
+			if channel.Name == discordCfg.AnimeChannel {
 				discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, channel.ID)
 			}
 		}
@@ -87,11 +93,48 @@ func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
 	log.Println("Connected to discord as", discordCfg.Name)
 }
 
+//discordNewChannelHandler handles joining new channels
+func discordNewChannelHandler(s *discordgo.Session, c *discordgo.ChannelCreate) {
+	if c.Name == discordCfg.AnimeChannel {
+		discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, c.ID)
+	}
+}
+
+//discordLeaveChannelHandler handles leaving channels
+func discordLeaveChannelHandler(s *discordgo.Session, c *discordgo.ChannelDelete) {
+	if c.Name == discordCfg.AnimeChannel {
+		discordCfg.AnimeChannels = removeItem(discordCfg.AnimeChannels, c.ID)
+	}
+}
+
+//discordChannelUpdateHandler handles channels being updated
+func discordChannelUpdateHandler(s *discordgo.Session, c *discordgo.ChannelUpdate) {
+	if c.Name == discordCfg.AnimeChannel {
+		discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, c.ID)
+	} else {
+		discordCfg.AnimeChannels = removeItem(discordCfg.AnimeChannels, c.ID)
+	}
+}
+
+//discordNewGuildHandler handlers joining a guild
+func discordNewGuildHandler(s *discordgo.Session, g *discordgo.GuildCreate) {
+	discordCfg.Guilds = append(discordCfg.Guilds, g.Name)
+}
+
+//discordLeaveGuildHandler handles leaving/being kicked from a guild
+func discordLeaveGuildHandler(s *discordgo.Session, g *discordgo.GuildDelete) {
+	discordCfg.Guilds = removeItem(discordCfg.Guilds, g.Name)
+}
+
 //discordMsgHandler is a handler function for incomming discord messages
 func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	botMessages++
+	//Split messages into arguments
+	args := strings.Fields(m.Content)
 	//Check if author is admin
 	boss := m.Author.ID == discordCfg.Boss
+	//Check if second argument is this bots name
+	botcheck := (len(args) > 1 && strings.ToUpper(args[1]) == discordCfg.Name)
 	//Check if message is relevant to the bot
 	//i.e message starts with '!' followed by a word
 	relevant := relevantRegex.MatchString(m.Content)
@@ -99,7 +142,6 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//If message is relevant process it otherwise leave this function
 	if relevant {
 		botResponses++
-		args := strings.Fields(m.Content)
 		switch strings.ToUpper(args[0]) {
 
 		//!HELP [string]
@@ -199,15 +241,10 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//will only work for admin of the bot
 		//FIXME
 		case "!GUILDS":
-			if boss {
-				if len(args) > 1 {
-					if strings.ToUpper(args[1]) == discordCfg.Name {
-						s.ChannelMessageSend(m.ChannelID, strings.Join(discordCfg.Guilds, ","))
-					}
-				} else {
-					log.Println(discordCfg.Guilds)
-					s.ChannelMessageSend(m.ChannelID, strings.Join(discordCfg.Guilds, ","))
-				}
+			if boss && (botcheck || len(args) == 1) {
+				s.ChannelMessageSend(m.ChannelID,
+					fmt.Sprintf("Currently in %d guilds: %s",
+						len(discordCfg.Guilds), strings.Join(discordCfg.Guilds, ", ")))
 			}
 		}
 	}

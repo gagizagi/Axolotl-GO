@@ -67,3 +67,15 @@ func appendUnique(slice []string, id string) []string {
 	}
 	return append(slice, id)
 }
+
+//removeItem removes a string from the array and returns the new array
+//first param is the array to remove from
+//second param is the string to remove from array (removes all instances)
+func removeItem(slice []string, item string) []string {
+	for i, value := range slice {
+		if value == item {
+			slice = append(slice[:i], slice[i+1:]...)
+		}
+	}
+	return slice
+}
