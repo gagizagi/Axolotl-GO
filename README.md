@@ -40,7 +40,9 @@ Discord bot utility features such as weather, Path of exile utilities and more.
 ### Contact
 
 PM me on discord @GazZy#5249
+
 or
+
 Visit us in our Discord guild at [422 Discord](https://discord.gg/0cO53vq26OlEojNi)
 
 ### Credits
