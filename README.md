@@ -36,6 +36,7 @@ Discord bot utility features such as weather, Path of exile utilities and more.
 !w *location*|Returns current weather for location in Discord channel|!w Ljubljana|Will make a best guess if location is unknown
 !p *string*|Sets the game bot is "playing"|!p minecraft|Admin only
 !info|Returns information about the bot
+!guilds|Returns a list of all the guilds this bot is in| |Admin only
 
 ### Contact
 
