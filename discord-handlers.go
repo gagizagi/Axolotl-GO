@@ -56,7 +56,7 @@ func discordChannelUpdateHandler(s *discordgo.Session, c *discordgo.ChannelUpdat
 
 //discordNewGuildHandler handlers joining a guild
 func discordNewGuildHandler(s *discordgo.Session, g *discordgo.GuildCreate) {
-	discordCfg.Guilds = append(discordCfg.Guilds, g.Name)
+	discordCfg.Guilds = appendUnique(discordCfg.Guilds, g.Name)
 }
 
 //discordLeaveGuildHandler handles leaving/being kicked from a guild
