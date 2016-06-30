@@ -88,12 +88,25 @@ func newEpisode(args []string) {
 					"To subscribe to this anime type \"!sub %s\"",
 					episode.ID)
 
+				//TODO make a function
 				for _, channel := range discordCfg.AnimeChannels {
 					discord.ChannelMessageSend(channel, resultstr)
 				}
 			}
 		}
 	} else {
+		//Insert series into DB
 		episode.Insert()
+
+		//Announce new series to all anime channels
+		resultstr := fmt.Sprintf("**New series started: %s - Episode %d**\n",
+			episode.Name, episode.Episode)
+		resultstr += fmt.Sprintf("To subscribe to this anime type \"!sub %s\"",
+			episode.ID)
+
+		//TODO make a function
+		for _, channel := range discordCfg.AnimeChannels {
+			discord.ChannelMessageSend(channel, resultstr)
+		}
 	}
 }
