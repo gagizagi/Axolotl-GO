@@ -50,7 +50,7 @@ func discordStart(c *discordConfig) {
 
 	//Connect to discord with token
 	var err error
-	discord, err = discordgo.New(c.Token)
+	discord, err = discordgo.New("Bot " + c.Token)
 	if err != nil {
 		log.Fatal("Error initializing discord in discordStart() function!\n", err)
 	}
