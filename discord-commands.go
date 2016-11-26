@@ -90,6 +90,7 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//!P string
 		//Sets the 'currently playing' state of the bot
 		//will only work for admin of the bot
+		//FIXME Wont update without first being set to empty
 		case "!P":
 			if boss {
 				if len(args) > 1 {
