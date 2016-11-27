@@ -57,9 +57,16 @@ func discordChannelUpdateHandler(s *discordgo.Session, c *discordgo.ChannelUpdat
 //discordNewGuildHandler handlers joining a guild
 func discordNewGuildHandler(s *discordgo.Session, g *discordgo.GuildCreate) {
 	discordCfg.Guilds = appendUnique(discordCfg.Guilds, g.Name)
+
+	for _, c := range g.Channels {
+		if c.Name == discordCfg.AnimeChannel {
+			discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, c.ID)
+		}
+	}
 }
 
 //discordLeaveGuildHandler handles leaving/being kicked from a guild
+//FIXME remove this anime channel from config when kicked
 func discordLeaveGuildHandler(s *discordgo.Session, g *discordgo.GuildDelete) {
 	discordCfg.Guilds = removeItem(discordCfg.Guilds, g.Name)
 }
