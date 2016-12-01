@@ -10,6 +10,12 @@ import (
 //discordMsgHandler is a handler function for incomming discord messages
 func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	botMessages++
+
+	/*TODO
+	Add counter for !w command to track number of calls.
+	Limit for this OWM api key is 600 calls per 10min AND 50k calls a day.
+	*/
+
 	//Split messages into arguments
 	args := strings.Fields(m.Content)
 	//Check if author is admin
