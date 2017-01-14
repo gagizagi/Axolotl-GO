@@ -83,7 +83,9 @@ func newEpisode(args []string) {
 				for _, person := range episode.Subs {
 					resultstr += fmt.Sprintf("<@%s>", person)
 				}
-				resultstr += fmt.Sprintf("\nDownload at %s\n", episode.Href)
+				if episode.Href != "" {
+					resultstr += fmt.Sprintf("\nDownload at %s\n", episode.Href)
+				}
 				resultstr += fmt.Sprintf(
 					"To subscribe to this anime type \"!sub %s\"",
 					episode.ID)
