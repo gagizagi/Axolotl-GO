@@ -27,6 +27,7 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	relevant := relevantRegex.MatchString(m.Content)
 
 	//If message is relevant process it otherwise leave this function
+	//TODO refactor this into something more readable
 	if relevant {
 		botResponses++
 		switch strings.ToUpper(args[0]) {
