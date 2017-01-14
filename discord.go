@@ -32,7 +32,7 @@ const (
 		"!w <location> (Prints current weather)\n" +
 		"!info [bot] (Prints bot information)" +
 		"```\n" +
-		"Find anime list at http://gazzy.space/anime"
+		"Find anime list at http://axolotl-422.rhcloud.com/"
 )
 
 //Declare variables
