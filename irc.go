@@ -80,16 +80,25 @@ func newEpisode(args []string) {
 				resultstr := fmt.Sprintf(
 					"**New episode of %s released - Episode %d**\n",
 					episode.Name, episode.Episode)
+
+				//Add mentions for every subbed user
 				for _, person := range episode.Subs {
 					resultstr += fmt.Sprintf("<@%s>", person)
 				}
+
+				//Add download link
 				if episode.Href != "" {
 					resultstr += fmt.Sprintf("\nDownload at %s\n", episode.Href)
+				} else {
+					resultstr += fmt.Sprint("\nDownload at http://horriblesubs.info/\n")
 				}
+
+				//Add subscribe ID
 				resultstr += fmt.Sprintf(
 					"To subscribe to this anime type \"!sub %s\"",
 					episode.ID)
 
+				//Send update message to all anime channels
 				//TODO make a function
 				for _, channel := range discordCfg.AnimeChannels {
 					discord.ChannelMessageSend(channel, resultstr)
