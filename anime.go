@@ -60,6 +60,7 @@ func maintainAnimeList() {
 		}
 		if now.Sub(a.LastUpdate) > LIMIT {
 			a.Remove()
+			removals++
 		}
 	}
 	log.Printf("AUTO-MAINTANANCE: animeList updated! (removed: %d | updated: %d)\n",
