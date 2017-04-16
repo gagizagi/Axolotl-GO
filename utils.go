@@ -28,7 +28,7 @@ func getUptime() string {
 func getWeather(location string) (result string) {
 	w, err := owm.NewCurrent("C", "en")
 	if err != nil {
-		log.Print("getWeather() => newCurrent() error:\n", err)
+		log.Print("OpenWeatherMap error: ", err)
 		return "error"
 	}
 
@@ -64,7 +64,7 @@ func getUniqueSubs() int {
 	var uniqueSubs []string
 	err := DBanimeList.Find(bson.M{}).Distinct("subs", &uniqueSubs)
 	if err != nil {
-		log.Print("getUniqueSubs() => error:\n", err)
+		log.Print("MongoDB error: ", err)
 	}
 
 	return len(uniqueSubs)
