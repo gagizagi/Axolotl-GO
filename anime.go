@@ -35,6 +35,15 @@ func getAnimeList() (result animeList) {
 	return
 }
 
+//Get every anime this user.id is subscribed to
+func getAnimeListForUser(userID string) (result animeList) {
+	err := DBanimeList.Find(bson.M{"subs": userID}).All(&result)
+	if err != nil {
+		log.Println("MongoDB error: ", err)
+	}
+	return
+}
+
 //db maintanance process calls animeMaintanance function once on startup
 //and after every interval time.Duration
 func maintainAnimeListProcess(interval time.Duration) {
