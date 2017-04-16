@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"time"
+	//"time"
 )
 
 var ircClient = ircConfig{
@@ -23,9 +23,9 @@ var discordClient = discordConfig{
 func main() {
 	dbConn()
 
-	go ircConnStart(&ircClient)
+	//go ircConnStart(&ircClient)
 	go discordStart(&discordClient)
-	go maintainAnimeListProcess(10 * time.Hour)
+	//go maintainAnimeListProcess(10 * time.Hour)
 
 	webServer() //Last
 }

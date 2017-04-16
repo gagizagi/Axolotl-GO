@@ -71,6 +71,21 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 			}
 
+		//!MYSUBS
+		//Lists all series this user is subscriberd to in format "SeriesName(id)"
+		case "!MYSUBS":
+			subs := fmt.Sprintf("<@%s> is subscribed to: ", m.Author.ID)
+			animeArray := getAnimeListForUser(m.Author.ID)
+
+			for i, anime := range animeArray {
+				if i > 0 {
+					subs += ", "
+				}
+				subs += fmt.Sprintf("%s(%s)", anime.Name, anime.ID)
+			}
+
+			s.ChannelMessageSend(m.ChannelID, subs)
+
 		//!UPTIME [string]
 		//Can optionally include bots name as second argument
 		case "!UPTIME":
