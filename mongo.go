@@ -20,7 +20,7 @@ func dbConn() {
 	//Connect to url
 	dbSession, err := mgo.Dial(url)
 	if err != nil {
-		log.Fatal("dbConn() => Dial() error:\t", err)
+		log.Fatal("MongoDB error: ", err)
 	}
 
 	//authenticate
