@@ -30,7 +30,7 @@ const LIMIT = 22 * 24 * time.Hour
 func getAnimeList() (result animeList) {
 	err := DBanimeList.Find(nil).Sort("lastUpdate").All(&result)
 	if err != nil {
-		log.Println("getAnimeList() => Find() error:\t", err)
+		log.Println("MongoDB error: ", err)
 	}
 	return
 }
