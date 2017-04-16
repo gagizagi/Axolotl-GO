@@ -7,6 +7,7 @@ import (
 	"time"
 
 	owm "github.com/briandowns/openweathermap"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var (
@@ -50,11 +51,23 @@ func getInfo() (result string) {
 	result += fmt.Sprintf("Uptime: %s\n", getUptime())
 	result += fmt.Sprintf("Guilds: %d\n", len(discordCfg.Guilds))
 	result += fmt.Sprintf("Anime channels: %d\n", len(discordCfg.AnimeChannels))
+	result += fmt.Sprintf("Unique subscribers: %d\n", getUniqueSubs())
 	result += fmt.Sprintf("Messages read: %d\n", botMessages)
 	result += fmt.Sprintf("Message responses: %d\n", botResponses)
 	result += "```"
 
 	return
+}
+
+//getUniqueSubs returs the amount of unique subscribers in the database
+func getUniqueSubs() int {
+	var uniqueSubs []string
+	err := DBanimeList.Find(bson.M{}).Distinct("subs", &uniqueSubs)
+	if err != nil {
+		log.Print("getUniqueSubs() => error:\n", err)
+	}
+
+	return len(uniqueSubs)
 }
 
 //appendUnique is a function for appending a string to string array
