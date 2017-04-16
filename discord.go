@@ -33,7 +33,8 @@ const (
 		"!w <location> (Prints current weather)\n" +
 		"!info [bot] (Prints bot information)" +
 		"```\n" +
-		"Find anime list at http://axolotl-422.rhcloud.com/"
+		"Full anime list at http://axolotl-422.rhcloud.com/ \n" +
+		"For issues and suggestions go to https://github.com/gagizagi/Axolotl-GO"
 )
 
 //Declare variables
