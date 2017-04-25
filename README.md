@@ -6,7 +6,8 @@
 
 Discord and IRC bot focused primarily on providing current season airing anime episode
 updates as discord @mentions, but also providing an ever-increasing list of
-Discord bot utility features such as weather, Path of exile utilities and more.
+Discord bot utility features such as weather.
+Bot has 99.9% uptime and is currently in daily use on over 150 servers.
 
 ### Navigation
 
