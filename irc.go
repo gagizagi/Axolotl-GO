@@ -51,7 +51,7 @@ func ircMsgHandler(e *ircevent.Event) {
 
 	if releaseWatch.MatchString(e.Message()) == true {
 		newEpisode(releaseWatch.FindStringSubmatch(e.Message()))
-	} else if e.Arguments[0] == ircClient.Nickname && e.Nick != ircClient.Nickname {
+	} else if e.Arguments[0] == ircConn.GetNick() && e.Nick != ircConn.GetNick() {
 		ircConn.Privmsg(e.Nick, "Discord BOT - https://github.com/gagizagi/Axolotl-GO")
 		ircConn.Privmsg(e.Nick, "Current uptime is "+getUptime())
 	}
