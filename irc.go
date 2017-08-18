@@ -21,6 +21,7 @@ type ircConfig struct {
 var (
 	ircConn *ircevent.Connection //irc connection
 	ircCfg  *ircConfig           //irc config
+
 	//regex parse string for newEpisode()
 	releaseWatch = regexp.MustCompile(
 		`(?i)release:.+\[horriblesubs\] (.+) - ([0-9]{1,3}) \[(1080p|720p|480p)\]`)
@@ -49,7 +50,7 @@ func ircMsgHandler(e *ircevent.Event) {
 	//Release: [Anime] [HorribleSubs] Ushio to Tora - 22 [480p].mkv
 	//Release: [Anime] [HorribleSubs] Hackadoll the Animation - 09 [720p].mkv
 
-	if releaseWatch.MatchString(e.Message()) == true {
+	if releaseWatch.MatchString(e.Message()) {
 		newEpisode(releaseWatch.FindStringSubmatch(e.Message()))
 	} else if e.Arguments[0] == ircConn.GetNick() && e.Nick != ircConn.GetNick() {
 		ircConn.Privmsg(e.Nick, "Discord BOT - https://github.com/gagizagi/Axolotl-GO")
