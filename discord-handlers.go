@@ -66,7 +66,7 @@ func discordNewGuildHandler(s *discordgo.Session, g *discordgo.GuildCreate) {
 }
 
 //discordLeaveGuildHandler handles leaving/being kicked from a guild
-//FIXME remove this anime channel from config when kicked
+//FIXME: remove this anime channel from config when kicked
 func discordLeaveGuildHandler(s *discordgo.Session, g *discordgo.GuildDelete) {
 	discordCfg.Guilds = removeItem(discordCfg.Guilds, g.Name)
 }

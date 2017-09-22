@@ -100,7 +100,7 @@ func newEpisode(args []string) {
 					episode.ID)
 
 				//Send update message to all anime channels
-				//TODO make a function
+				//TODO: make a function
 				for _, channel := range discordCfg.AnimeChannels {
 					discord.ChannelMessageSend(channel, resultstr)
 				}
@@ -116,7 +116,7 @@ func newEpisode(args []string) {
 		resultstr += fmt.Sprintf("To subscribe to this anime type \"!sub %s\"",
 			episode.ID)
 
-		//TODO make a function
+		//TODO: make a function
 		for _, channel := range discordCfg.AnimeChannels {
 			discord.ChannelMessageSend(channel, resultstr)
 		}
