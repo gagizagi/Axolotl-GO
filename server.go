@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
-	"log"
 	"net/http"
-	"os"
 	"sort"
 
 	"github.com/eknkc/amber"
+	"google.golang.org/appengine"
 )
 
 //template map
@@ -27,20 +25,7 @@ func webServer() {
 	http.HandleFunc("/", animeHandler)
 	http.HandleFunc("/static/", staticHandler)
 
-	//Sets url and port
-	bind := fmt.Sprintf("%s:%s", "127.0.0.1", "422")
-	if os.Getenv("OPENSHIFT_GO_IP") != "" &&
-		os.Getenv("OPENSHIFT_GO_PORT") != "" {
-		bind = fmt.Sprintf("%s:%s", os.Getenv("OPENSHIFT_GO_IP"),
-			os.Getenv("OPENSHIFT_GO_PORT"))
-	}
-
-	//Listen and sert to port
-	log.Printf("Web server listening on %s", bind)
-	err := http.ListenAndServe(bind, nil)
-	if err != nil {
-		log.Fatal("webServer() => ListenAndServer() error:\t", err)
-	}
+	appengine.Main()
 }
 
 // /anime path handler
