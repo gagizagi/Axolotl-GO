@@ -33,7 +33,7 @@ const (
 		"!w <location> (Prints current weather)\n" +
 		"!info [bot] (Prints bot information)" +
 		"```\n" +
-		"Full anime list at http://axolotl-422.rhcloud.com/ \n" +
+		"Full anime list at https://axolotl-181300.appspot.com/ \n" +
 		"For issues and suggestions go to https://github.com/gagizagi/Axolotl-GO"
 )
 
