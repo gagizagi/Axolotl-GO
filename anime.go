@@ -167,10 +167,11 @@ func (a *anime) GenID() {
 //Gets href for Anime.Name
 func (a *anime) GetHref() (success int) {
 	success = 0
-	scrapper, target :=
-		"http://scraper-422.rhcloud.com/?href=",
-		"http://horriblesubs.info/current-season/"
-	doc, err := goquery.NewDocument(scrapper + target)
+	//FIXME: Cloudflare scraping not needed for now
+	//scrapper := "http://scraper-422.rhcloud.com/?href="
+	target := "http://horriblesubs.info/current-season/"
+
+	doc, err := goquery.NewDocument( /*scrapper + */ target)
 	if err != nil {
 		fmt.Println(err)
 	} else {
