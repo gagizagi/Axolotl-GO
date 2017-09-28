@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -12,10 +13,10 @@ var DBanimeList *mgo.Collection
 
 func dbConn() {
 	//Set url
-	url := "localhost"
-	if os.Getenv("OPENSHIFT_MONGODB_DB_URL") != "" {
-		url = os.Getenv("OPENSHIFT_MONGODB_DB_URL")
-	}
+	url := fmt.Sprintf(
+		"mongodb://%s:%s@ds141434.mlab.com:41434/axolotl",
+		os.Getenv("MLAB_USER"),
+		os.Getenv("MLAB_PASS"))
 
 	//Connect to url
 	dbSession, err := mgo.Dial(url)
@@ -23,20 +24,11 @@ func dbConn() {
 		log.Fatal("MongoDB error: ", err)
 	}
 
-	//authenticate
-	if os.Getenv("OPENSHIFT_MONGODB_DB_USERNAME") != "" &&
-		os.Getenv("OPENSHIFT_MONGODB_DB_PASSWORD") != "" {
-		creds := mgo.Credential{
-			Username: os.Getenv("OPENSHIFT_MONGODB_DB_USERNAME"),
-			Password: os.Getenv("OPENSHIFT_MONGODB_DB_PASSWORD")}
-
-		dbSession.Login(&creds)
-	}
 	dbSession.SetMode(mgo.Monotonic, true)
 
 	//Set collections
 	DBanimeList = dbSession.DB("axolotl").C("animeList")
 
 	//Success
-	log.Printf("Connected to MongoDB on %s\n", url)
+	log.Println("Connected to MongoDB")
 }
