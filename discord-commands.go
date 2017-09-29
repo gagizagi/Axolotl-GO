@@ -11,8 +11,7 @@ import (
 func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	botMessages++
 
-	/*TODO:
-	Add counter for !w command to track number of calls.
+	/*TODO: Add counter for !w command to track number of calls.
 	Limit for this OWM api key is 600 calls per 10min AND 50k calls a day.
 	*/
 
@@ -27,7 +26,7 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	relevant := relevantRegex.MatchString(m.Content)
 
 	//If message is relevant process it otherwise leave this function
-	//TODO: refactor this into something more readable
+	//TODO: Refactor this into something more readable
 	if relevant {
 		botResponses++
 		switch strings.ToUpper(args[0]) {
