@@ -142,7 +142,7 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//Can optionally include bots name as second argument
 		//Lists all the guilds this bot is a part of
 		//will only work for admin of the bot
-		//FIXME:
+		//FIXME: https://github.com/gagizagi/Axolotl-GO/issues/6
 		case "!GUILDS":
 			if boss && (botcheck || len(args) == 1) {
 				s.ChannelMessageSend(m.ChannelID,

@@ -65,7 +65,7 @@ func maintainAnimeList() {
 	now := time.Now()
 	for _, a := range newAnimeList {
 		if len(a.Href) < 5 {
-			updates += a.GetHref()
+			updates += a.GetHref() //TODO: Limit HS scraping to maximum 1 per maintanance, instead of 1 per empty href per maintanance
 		}
 		if now.Sub(a.LastUpdate) > LIMIT {
 			a.Remove()
@@ -167,7 +167,7 @@ func (a *anime) GenID() {
 //Gets href for Anime.Name
 func (a *anime) GetHref() (success int) {
 	success = 0
-	//FIXME: Cloudflare scraping not needed for now
+	//NOTE: Cloudflare scraping not needed for now
 	//scrapper := "http://scraper-422.rhcloud.com/?href="
 	target := "http://horriblesubs.info/current-season/"
 
