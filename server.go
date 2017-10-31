@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"os"
 	"sort"
 
 	"github.com/eknkc/amber"
@@ -25,7 +26,12 @@ func webServer() {
 	http.HandleFunc("/", animeHandler)
 	http.HandleFunc("/static/", staticHandler)
 
-	appengine.Main()
+	if os.Getenv("AX_ENV") == "production" {
+		appengine.Main()
+	} else {
+		addr := ":" + os.Getenv("AX_DEVELOPMENT_PORT")
+		http.ListenAndServe(addr, nil)
+	}
 }
 
 // /anime path handler

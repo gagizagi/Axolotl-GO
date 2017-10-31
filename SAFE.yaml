@@ -7,9 +7,10 @@ handlers:
   script: _go_app
 
 env_variables:
-  OWM_API_KEY: ''
-  DISCORD_BOSS: ''
-  DISCORD_TOKEN: ''
+  AX_ENV: 'production'
+  AX_OWM_API_KEY: ''
+  AX_DISCORD_BOSS: ''
+  AX_DISCORD_TOKEN: ''
   MLAB_USER: ''
   MLAB_PASS: ''
 
