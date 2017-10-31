@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"sort"
@@ -26,10 +27,13 @@ func webServer() {
 	http.HandleFunc("/", animeHandler)
 	http.HandleFunc("/static/", staticHandler)
 
+	log.Println("Starting http server...")
+
 	if os.Getenv("AX_ENV") == "production" {
 		appengine.Main()
 	} else {
 		addr := ":" + os.Getenv("AX_DEVELOPMENT_PORT")
+
 		http.ListenAndServe(addr, nil)
 	}
 }

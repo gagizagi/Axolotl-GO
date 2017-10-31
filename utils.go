@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"time"
 
 	owm "github.com/briandowns/openweathermap"
@@ -91,4 +92,14 @@ func removeItem(slice []string, item string) []string {
 		}
 	}
 	return slice
+}
+
+//checks if any of the provided required ENV variables is missing
+//logs the error and exits the program if any of them is missing
+func requireEnvVars(args ...string) {
+	for _, v := range args {
+		if os.Getenv(v) == "" {
+			log.Fatal("Missing ENV variable: ", v)
+		}
+	}
 }
