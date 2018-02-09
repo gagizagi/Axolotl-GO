@@ -1,6 +1,6 @@
 *.exe
 *.exe~
 
-.env
+/src/.env
 
 app.yaml
