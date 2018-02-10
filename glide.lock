@@ -1,0 +1,40 @@
+hash: bdf5c0b43903ad8f1246f2cdfe547d87d5dcc3a4055c326109e5a2a40514e3e3
+updated: 2018-02-10T12:10:43.696030444Z
+imports:
+- name: github.com/andybalholm/cascadia
+  version: 349dd0209470eabd9514242c688c403c0926d266
+- name: github.com/bwmarrin/discordgo
+  version: 8d5ab59c63e553fd2030706008a806a8b553188c
+- name: github.com/eknkc/amber
+  version: cdade1c073850f4ffc70a829e31235ea6892853b
+  subpackages:
+  - parser
+- name: github.com/gorilla/websocket
+  version: 4ac909741dfa57448bfadfdbca0cf7eeaa68f0e2
+- name: github.com/joho/godotenv
+  version: 6bb08516677f8c8274c557fc801bee9ab564ab2c
+  subpackages:
+  - autoload
+- name: github.com/PuerkitoBio/goquery
+  version: 09540e565986583836b5fc792fe951ec5fd201dd
+- name: github.com/thoj/go-ircevent
+  version: db5bd176f7c6f4b2f15c46142fdc8319a365bf6e
+- name: golang.org/x/crypto
+  version: 5119cf507ed5294cc409c092980c7497ee5d6fd2
+  subpackages:
+  - nacl/secretbox
+  - poly1305
+  - salsa20/salsa
+- name: golang.org/x/net
+  version: f5dfe339be1d06f81b22525fe34671ee7d2c8904
+  subpackages:
+  - html
+  - html/atom
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - internal/json
+  - internal/sasl
+  - internal/scram
+testImports: []

@@ -96,18 +96,6 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				s.ChannelMessageSend(m.ChannelID, "Current uptime is "+getUptime())
 			}
 
-		//!W string
-		//Looks up weather at the the location string
-		case "!W":
-			if len(args) > 1 {
-				var location string
-				for i := 1; i < len(args); i++ {
-					location += args[i] + " "
-				}
-				location = location[:len(location)-1]
-				s.ChannelMessageSend(m.ChannelID, getWeather(location))
-			}
-
 		//!P string
 		//Sets the 'currently playing' state of the bot
 		//will only work for admin of the bot

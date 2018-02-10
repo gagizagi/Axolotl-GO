@@ -1,6 +1,7 @@
+vendor
+
 *.exe
 *.exe~
 
-/src/.env
-
-app.yaml
+.env
+gin-bin

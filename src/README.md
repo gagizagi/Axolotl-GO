@@ -4,9 +4,7 @@
 
 ### Introduction
 
-Discord and IRC bot focused primarily on providing current season airing anime episode
-updates as discord @mentions, but also providing an ever-increasing list of
-Discord bot utility features such as weather.
+Discord and IRC bot focused primarily on providing current season airing anime episode updates as discord @mentions.
 Bot has 99.9% uptime and is currently in daily use on over 150 servers.
 
 ### Navigation
@@ -35,7 +33,6 @@ Bot has 99.9% uptime and is currently in daily use on over 150 servers.
 !sub *id*|Subscribe to the anime series to receive @mentions whenever a new episode is released.|!sub yls|Get full list of series [here](https://axolotl-181300.appspot.com/)
 !unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here](https://axolotl-181300.appspot.com/)
 !mysubs|Lists all the anime you are subscribed to
-!w *location*|Returns current weather for location in Discord channel|!w Ljubljana|Will make a best guess if location is unknown
 !p *string*|Sets the game bot is "playing"|!p minecraft|Admin only
 !info|Returns information about the bot
 !guilds|Returns a list of all the guilds this bot is in| |Admin only
@@ -57,9 +54,5 @@ Visit us in our Discord guild at [422 Discord](https://discord.gg/0cO53vq26OlEoj
 ###### Discord free VoIP - <https://discordapp.com/>
 
 ###### Discord GO package - [discordgo](https://github.com/bwmarrin/discordgo#discordgo-) by [bwmarrin](https://github.com/bwmarrin)
-
-###### Weather API - <http://openweathermap.org/>
-
-###### Openweathermap GO package - [github.com/briandowns/openweathermap](https://github.com/briandowns/openweathermap)
 
 ###### IRC GO package - [github.com/thoj/go-ircevent](https://github.com/thoj/go-ircevent)

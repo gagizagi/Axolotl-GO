@@ -10,14 +10,14 @@ import (
 var ircClient = ircConfig{
 	Server:   "irc.rizon.net:6667",
 	Channels: []string{"#422", "#HORRIBLESUBS"},
-	Nickname: os.Getenv("AX_IRC_NICKNAME"),
+	Nickname: os.Getenv("IRC_NICKNAME"),
 	Verbose:  false,
 	Debug:    false,
 }
 
 var discordClient = discordConfig{
-	Boss:         os.Getenv("AX_DISCORD_BOSS"),
-	Token:        os.Getenv("AX_DISCORD_TOKEN"),
+	Boss:         os.Getenv("DISCORD_BOSS"),
+	Token:        os.Getenv("DISCORD_TOKEN"),
 	AnimeChannel: "anime",
 	Debug:        false,
 }

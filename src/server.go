@@ -8,7 +8,6 @@ import (
 	"sort"
 
 	"github.com/eknkc/amber"
-	"google.golang.org/appengine"
 )
 
 //template map
@@ -16,7 +15,7 @@ var templateMap map[string]*template.Template
 
 //initialization of the template map
 func init() {
-	templateMap, _ = amber.CompileDir("views",
+	templateMap, _ = amber.CompileDir("src/views",
 		amber.DirOptions{Ext: ".amber", Recursive: true},
 		amber.Options{PrettyPrint: false, LineNumbers: false})
 }
@@ -29,13 +28,9 @@ func webServer() {
 
 	log.Println("Starting http server...")
 
-	if os.Getenv("AX_ENV") == "production" {
-		appengine.Main()
-	} else {
-		addr := ":" + os.Getenv("AX_DEVELOPMENT_PORT")
+	addr := ":" + os.Getenv("DEVELOPMENT_PORT")
 
-		http.ListenAndServe(addr, nil)
-	}
+	http.ListenAndServe(addr, nil)
 }
 
 // /anime path handler

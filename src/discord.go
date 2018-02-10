@@ -30,7 +30,6 @@ const (
 		"!sub <id> (Subscribe to anime and get notified when a new episode is released)\n" +
 		"!unsub <id> (Unsubscribe from anime)\n" +
 		"!mysubs (List all the anime you are subscribed to)\n" +
-		"!w <location> (Prints current weather)\n" +
 		"!info [bot] (Prints bot information)" +
 		"```\n" +
 		"Full anime list at https://axolotl-181300.appspot.com/ \n" +

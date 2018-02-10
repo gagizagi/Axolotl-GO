@@ -15,24 +15,24 @@ var DBanimeList *mgo.Collection
 var DBserverList *mgo.Collection
 
 func init() {
-	requireEnvVars("AX_DATABASE_HOST", "AX_DATABASE_PORT", "AX_DATABASE_DB")
+	requireEnvVars("DATABASE_HOST", "DATABASE_PORT", "DATABASE_DB")
 }
 
 func dbConn() {
 	// Make the mongo connection URL
 	// mongodb://<user>:<password>@<host>:<port>/<database>
 	url := "mongodb://"
-	if os.Getenv("AX_DATABASE_USERNAME") != "" &&
-		os.Getenv("AX_DATABASE_PASSWORD") != "" {
+	if os.Getenv("DATABASE_USERNAME") != "" &&
+		os.Getenv("DATABASE_PASSWORD") != "" {
 
 		url += fmt.Sprintf("%s:%s@",
-			os.Getenv("AX_DATABASE_USERNAME"),
-			os.Getenv("AX_DATABASE_PASSWORD"))
+			os.Getenv("DATABASE_USERNAME"),
+			os.Getenv("DATABASE_PASSWORD"))
 	}
 	url += fmt.Sprintf("%s:%s/%s",
-		os.Getenv("AX_DATABASE_HOST"),
-		os.Getenv("AX_DATABASE_PORT"),
-		os.Getenv("AX_DATABASE_DB"))
+		os.Getenv("DATABASE_HOST"),
+		os.Getenv("DATABASE_PORT"),
+		os.Getenv("DATABASE_DB"))
 
 	// Connect to database URL
 	dbSession, err := mgo.Dial(url)
@@ -45,12 +45,12 @@ func dbConn() {
 	dbSession.SetMode(mgo.Monotonic, true)
 
 	// Set collections
-	dbName := os.Getenv("AX_DATABASE_DB")
+	dbName := os.Getenv("DATABASE_DB")
 	DBanimeList = dbSession.DB(dbName).C("animeList")
 	DBserverList = dbSession.DB(dbName).C("serverList")
 
 	// Success
 	log.Println(fmt.Sprintf("Connected to MongoDB %s on port %s",
-		os.Getenv("AX_DATABASE_HOST"),
-		os.Getenv("AX_DATABASE_PORT")))
+		os.Getenv("DATABASE_HOST"),
+		os.Getenv("DATABASE_PORT")))
 }
