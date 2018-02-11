@@ -30,8 +30,8 @@ Bot has 99.9% uptime and is currently in daily use on over 150 servers.
 ---|---|---|---
 !help|Returns a list of all available commands in Discord chat.
 !uptime|Returns current uptime of the bot.
-!sub *id*|Subscribe to the anime series to receive @mentions whenever a new episode is released.|!sub yls|Get full list of series [here](https://axolotl-181300.appspot.com/)
-!unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here](https://axolotl-181300.appspot.com/)
+!sub *id*|Subscribe to the anime series to receive @mentions whenever a new episode is released.|!sub yls|Get full list of series [here (temporaray site)](http://85.217.171.2/)
+!unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here (temporary site)](http://85.217.171.2/)
 !mysubs|Lists all the anime you are subscribed to
 !p *string*|Sets the game bot is "playing"|!p minecraft|Admin only
 !info|Returns information about the bot

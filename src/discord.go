@@ -32,7 +32,7 @@ const (
 		"!mysubs (List all the anime you are subscribed to)\n" +
 		"!info [bot] (Prints bot information)" +
 		"```\n" +
-		"Full anime list at https://axolotl-181300.appspot.com/ \n" +
+		"Full anime list at http://85.217.171.2/ (temporary site) \n" +
 		"For issues and suggestions go to https://github.com/gagizagi/Axolotl-GO"
 )
 
