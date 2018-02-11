@@ -42,5 +42,5 @@ func animeHandler(w http.ResponseWriter, r *http.Request) {
 
 // /static/* file server
 func staticHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, r.URL.Path[1:])
+	http.ServeFile(w, r, "src/"+r.URL.Path[1:])
 }
