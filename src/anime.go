@@ -24,7 +24,9 @@ type anime struct {
 }
 
 //LIMIT is a time constant for 22 Days (for removal of outdated db entries)
-const LIMIT = 22 * 24 * time.Hour
+//FIXME: Will start keeping old records but adding a "shown" bool field for each entry (to keep subs for possible future seasons)
+//FIXME:	Temp fix until that is done
+const LIMIT = 200 * 24 * time.Hour
 
 //Gets every anime in animeList db and returns it as AnimeList type
 func getAnimeList() (result animeList) {
@@ -50,7 +52,7 @@ func maintainAnimeListProcess(interval time.Duration) {
 	maintainAnimeList()
 	log.Println("Next maintanance in ", interval.String())
 
-	for _ = range time.Tick(interval) {
+	for range time.Tick(interval) {
 		maintainAnimeList()
 		log.Println("Next maintanance in ", interval.String())
 	}

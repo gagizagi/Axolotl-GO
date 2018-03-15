@@ -1,0 +1,16 @@
+version: "3"
+services:
+  axolotl:
+    build: .
+    image: axolotl:15.3-dev
+    container_name: axolotl
+    depends_on:
+      - mongo
+    ports:
+      - 80:80
+      
+  mongo:
+    image: mongo
+    container_name: mongo
+    volumes:
+      - ~/db:/data/db

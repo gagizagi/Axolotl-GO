@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"sort"
 
 	"github.com/eknkc/amber"
@@ -28,9 +27,7 @@ func webServer() {
 
 	log.Println("Starting http server...")
 
-	addr := ":" + os.Getenv("DEVELOPMENT_PORT")
-
-	http.ListenAndServe(addr, nil)
+	http.ListenAndServe(":80", nil)
 }
 
 // /anime path handler
