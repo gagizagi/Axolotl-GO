@@ -2,16 +2,22 @@ version: "3"
 services:
   axolotl:
     build: .
-    image: axolotl:15.3-dev
+    image: axolotl:17.3-dev
     container_name: axolotl
     depends_on:
       - mongo
-    ports:
-      - 80:80
-      # add restart policy
-      
+    # add restart policy
+  
   mongo:
     image: mongo
     container_name: mongo
     volumes:
       - ~/db:/data/db
+  
+  nginx:
+    image: my-nginx
+    container_name: nginx
+    depends_on:
+      - axolotl
+    ports:
+      - 8080:80
