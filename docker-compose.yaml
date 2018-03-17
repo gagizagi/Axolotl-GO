@@ -15,6 +15,7 @@ services:
       - ~/db:/data/db
   
   nginx:
+    build: ./nginx
     image: my-nginx
     container_name: nginx
     depends_on:
