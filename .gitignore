@@ -1,5 +1,8 @@
 vendor
 
+*.crt
+*.key
+
 *.exe
 *.exe~
 
