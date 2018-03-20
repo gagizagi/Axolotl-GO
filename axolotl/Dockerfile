@@ -13,9 +13,6 @@ WORKDIR /go/src/app
 ADD glide.yaml glide.yaml
 ADD glide.lock glide.lock
 
-# add .env file
-ADD .env .env
-
 # install packages
 RUN glide install
 

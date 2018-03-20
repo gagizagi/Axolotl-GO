@@ -3,8 +3,6 @@ package main
 import (
 	"os"
 	"time"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 var ircClient = ircConfig{
