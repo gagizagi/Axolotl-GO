@@ -1,26 +1,29 @@
 version: "3"
 services:
   axolotl:
-    build: .
-    image: axolotl:17.3-dev
+    build: ./axolotl
+    image: axolotl:20.3-dev
     container_name: axolotl
     depends_on:
       - mongo
     restart: always
+    env_file: .env
   
   mongo:
     image: mongo
     container_name: mongo
     volumes:
-      - ~/db:/data/db
+      - ~/Axolotl/.db:/data/db
     restart: always
   
   nginx:
     build: ./nginx
-    image: my-nginx
+    image: my-nginx:20.3-dev
     container_name: nginx
+    volumes:
+      - ~/Axolotl/logs/nginx:/var/log/nginx
     depends_on:
       - axolotl
     ports:
-      - 8080:8080
+      - 80:80
     restart: always
