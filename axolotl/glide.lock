@@ -1,5 +1,5 @@
 hash: bdf5c0b43903ad8f1246f2cdfe547d87d5dcc3a4055c326109e5a2a40514e3e3
-updated: 2018-02-10T12:10:43.696030444Z
+updated: 2018-03-20T01:49:05.551019896Z
 imports:
 - name: github.com/andybalholm/cascadia
   version: 349dd0209470eabd9514242c688c403c0926d266
@@ -11,10 +11,6 @@ imports:
   - parser
 - name: github.com/gorilla/websocket
   version: 4ac909741dfa57448bfadfdbca0cf7eeaa68f0e2
-- name: github.com/joho/godotenv
-  version: 6bb08516677f8c8274c557fc801bee9ab564ab2c
-  subpackages:
-  - autoload
 - name: github.com/PuerkitoBio/goquery
   version: 09540e565986583836b5fc792fe951ec5fd201dd
 - name: github.com/thoj/go-ircevent
