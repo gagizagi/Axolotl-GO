@@ -4,8 +4,12 @@
 
 ### Introduction
 
+Update 21.3.2018: Moved and updated the bot for new long-term hosting. Many bot specific updates are already in the works
+and I can now focus just on those. The updates will focus on more reliable anime updates, guild/user specific settings and
+additional commands/features. Stay tuned!
+
 Discord and IRC bot focused primarily on providing current season airing anime episode updates as discord @mentions.
-Bot has 99.9% uptime and is currently in daily use on over 150 servers.
+Bot has 99.9% uptime and is currently in daily use on over 200 servers.
 
 ### Navigation
 
@@ -30,8 +34,8 @@ Bot has 99.9% uptime and is currently in daily use on over 150 servers.
 ---|---|---|---
 !help|Returns a list of all available commands in Discord chat.
 !uptime|Returns current uptime of the bot.
-!sub *id*|Subscribe to the anime series to receive @mentions whenever a new episode is released.|!sub yls|Get full list of series [here (temporaray site)](http://85.217.171.2/)
-!unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here (temporary site)](http://85.217.171.2/)
+!sub *id*|Subscribe to the anime series to receive @mentions whenever a new episode is released.|!sub yls|Get full list of series [here](https://axolotl.gazzy.online/)
+!unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here](https://axolotl.gazzy.online/)
 !mysubs|Lists all the anime you are subscribed to
 !p *string*|Sets the game bot is "playing"|!p minecraft|Admin only
 !info|Returns information about the bot

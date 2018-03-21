@@ -2,7 +2,7 @@ version: "3"
 services:
   axolotl:
     build: ./axolotl
-    image: axolotl:20.3-dev
+    image: axolotl:21.3
     container_name: axolotl
     depends_on:
       - mongo
@@ -18,7 +18,7 @@ services:
   
   nginx:
     build: ./nginx
-    image: my-nginx:20.3-dev
+    image: my-nginx:21.3
     container_name: nginx
     volumes:
       - ~/Axolotl/logs/nginx:/var/log/nginx
