@@ -78,8 +78,8 @@ func maintainAnimeList() {
 		removals, updates)
 }
 
-//Inserts a new anime entry to db
-//Generates unique id if it doesent exist
+// Insert inserts a new anime entry to db
+// generates a unique ID if it isn't present in the object yet
 func (a *anime) Insert() {
 	if a.ID == "" {
 		a.GenID()
@@ -101,7 +101,7 @@ func (a anime) Remove() (success int) {
 	return
 }
 
-//Updates the db entry with up-to-date episode number
+// UpdateEp updates the db entry with the new episode number
 func (a *anime) UpdateEp() {
 	updateQuery := bson.M{
 		"$set": bson.M{
@@ -196,9 +196,9 @@ func (a *anime) GetHref() (success int) {
 	return
 }
 
-//Checks if there is already an entry in db
-//with the same id OR the same name
-//returns true if it already exists
+// Exists checks if there is already an entry in db
+// with the same id OR the same name
+// Returns true if it already exists
 func (a anime) Exists() bool {
 	query := bson.M{
 		"$or": []interface{}{
@@ -212,10 +212,10 @@ func (a anime) Exists() bool {
 	return true
 }
 
-//Checks if episode # already exists in db
-//Returns true if episode in db is outdated and
-//needs to be updated and false if db is already
-//up to date
+// NewEpisode checks if episode # already exists in db
+// Returns true if episode in db is outdated and
+// needs to be updated and false if db is already
+// up to date
 func (a anime) NewEpisode() bool {
 	query := bson.M{
 		"name": a.Name,
