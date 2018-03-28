@@ -21,6 +21,7 @@ type anime struct {
 	Episode    int       `bson:"ep"`
 	Subs       []string  `bson:"subs"`
 	LastUpdate time.Time `bson:"lastUpdate"`
+	Show       bool      `bson:"show"`
 }
 
 //LIMIT is a time constant for 22 Days (for removal of outdated db entries)
@@ -85,6 +86,7 @@ func (a *anime) Insert() {
 		a.GenID()
 	}
 	a.LastUpdate = time.Now()
+	a.Show = true
 	DBanimeList.Insert(a)
 }
 
@@ -150,8 +152,8 @@ func (a *anime) RemoveSub(sub string) {
 	DBanimeList.Find(bson.M{"id": a.ID}).Apply(change, a)
 }
 
-//Generates a unique 3char alphanumeric ID
-//Not case sensitive
+// GenID generates a unique 3char alphanumeric ID
+// not case sensitive
 func (a *anime) GenID() {
 	var id, byteList string
 	byteList = "0123456789abcdefghijklmnopqrstuvwxyz"
