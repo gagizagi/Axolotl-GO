@@ -14,10 +14,6 @@ var DBanimeList *mgo.Collection
 // DBserverList is a database collection "serverList"
 var DBserverList *mgo.Collection
 
-func init() {
-	requireEnvVars("DATABASE_HOST", "DATABASE_PORT", "DATABASE_DB")
-}
-
 func dbConn() {
 	// Make the mongo connection URL
 	// mongodb://<user>:<password>@<host>:<port>/<database>

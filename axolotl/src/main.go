@@ -20,6 +20,10 @@ var discordClient = discordConfig{
 	Debug:        false,
 }
 
+func init() {
+	requireEnvVars("DATABASE_HOST", "DATABASE_PORT", "DATABASE_DB", "DISCORD_BOSS", "DISCORD_TOKEN")
+}
+
 func main() {
 	defer webServer()
 	dbConn()
