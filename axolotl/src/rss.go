@@ -19,8 +19,8 @@ var (
 func rssReader() {
 	defer rssReaderCleanup()
 
+	// Parse the RSS URL
 	fp := gofeed.NewParser()
-
 	feed, err := fp.ParseURL(rssURL)
 	if err != nil {
 		panic(fmt.Sprintf("Error trying to parse RSS feed URL: %s - %s", rssURL, err))
@@ -33,6 +33,8 @@ func rssReader() {
 		//True if the title of this feed item matches the regular expression
 		relevantTitle := titleRegex.MatchString(feed.Items[i].Title)
 
+		// If there is a new RSS entry published since last update date
+		// handle it with newUpdate() function
 		if relevantTitle && relevantDate {
 			regexArray := titleRegex.FindStringSubmatch(feed.Items[i].Title)
 			newUpdate(regexArray)
@@ -40,6 +42,8 @@ func rssReader() {
 	}
 }
 
+// rssReaderCleanup
+// will recover from any panics during RSS URL parsing
 func rssReaderCleanup() {
 	if r := recover(); r != nil {
 		fmt.Println(r)
@@ -106,13 +110,3 @@ func newUpdate(args []string) {
 		}
 	}
 }
-
-/*
-func timer(interval time.Duration, function func()) {
-	function()
-
-	for range time.Tick(interval) {
-		function()
-	}
-}
-*/
