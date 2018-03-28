@@ -24,10 +24,8 @@ type anime struct {
 	Show       bool      `bson:"show"`
 }
 
-//LIMIT is a time constant for 22 Days (for removal of outdated db entries)
-//FIXME: Will start keeping old records but adding a "shown" bool field for each entry (to keep subs for possible future seasons)
-//FIXME:	Temp fix until that is done
-const LIMIT = 200 * 24 * time.Hour
+//LIMIT is a time constant for 15 Days
+const LIMIT = 15 * 24 * time.Hour
 
 //Gets every anime in animeList db and returns it as AnimeList type
 func getAnimeList() (result animeList) {
@@ -47,36 +45,27 @@ func getAnimeListForUser(userID string) (result animeList) {
 	return
 }
 
-//db maintanance process calls animeMaintanance function once on startup
-//and after every interval time.Duration
-func maintainAnimeListProcess(interval time.Duration) {
-	maintainAnimeList()
-	log.Println("Next maintanance in ", interval.String())
-
-	for range time.Tick(interval) {
-		maintainAnimeList()
-		log.Println("Next maintanance in ", interval.String())
-	}
-}
-
-//db maintanance function called on app startup and after interval duration
-//deletes entries over LIMIT days old
-//gets urls for entries that don't have them
+// maintainAnimeList db maintanance function
+// changes the 'show' database field of all entries over LIMIT days old to false
+// tries to update the 'href' database field for entries that don't have one yet
+// TODO: Potentially merge this with rssReader
 func maintainAnimeList() {
-	removals, updates := 0, 0
+	// Number of hidden and/or updated entries
+	hidden, updated := 0, 0
 	newAnimeList := getAnimeList()
 	now := time.Now()
+
 	for _, a := range newAnimeList {
 		if len(a.Href) < 5 {
-			updates += a.GetHref() //TODO: Limit HS scraping to maximum 1 per maintanance, instead of 1 per empty href per maintanance
+			updated += a.GetHref() //TODO: Limit HS scraping to maximum 1 per maintanance, instead of 1 per empty href per maintanance
 		}
 		if now.Sub(a.LastUpdate) > LIMIT {
 			a.Remove()
-			removals++
+			hidden++
 		}
 	}
-	log.Printf("AUTO-MAINTANANCE: animeList updated! (removed: %d | updated: %d)\n",
-		removals, updates)
+	log.Printf("AUTO-MAINTANANCE: animeList updated! (hidden: %d | updated: %d)\n",
+		hidden, updated)
 }
 
 // Insert inserts a new anime entry to db

@@ -5,6 +5,7 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mmcdole/gofeed"
@@ -27,6 +28,9 @@ func rssReader() {
 		panic(fmt.Sprintf("Error trying to parse RSS feed URL: %s - %s", rssURL, err))
 	}
 
+	// Updated titles
+	var titleUpdates []string
+
 	//Iterates through the RSS feed items in reverse order
 	for i := len(feed.Items) - 1; i >= 0; i-- {
 		//True if the publish time/date of this feed item is after the cutoff time/date
@@ -39,9 +43,17 @@ func rssReader() {
 		// update cutoff time with the latest update time
 		if relevantTitle && relevantDate {
 			regexArray := titleRegex.FindStringSubmatch(feed.Items[i].Title)
-			newUpdate(regexArray)
-			cutoff = *feed.Items[i].PublishedParsed
+			ok := newUpdate(regexArray)
+
+			if ok {
+				titleUpdates = appendUnique(titleUpdates, regexArray[1])
+				cutoff = *feed.Items[i].PublishedParsed
+			}
 		}
+	}
+
+	if len(titleUpdates) > 0 {
+		log.Printf("Updated %d anime entries: %s", len(titleUpdates), strings.Join(titleUpdates, ", "))
 	}
 }
 
@@ -59,7 +71,7 @@ func rssReaderCleanup() {
 // 1 = anime name
 // 2 = episode (1-4 length integers only)
 // 3 = resolution (1080p | 720p | 480p)
-func newUpdate(args []string) {
+func newUpdate(args []string) bool {
 	epnum, _ := strconv.Atoi(args[2])
 	entry := anime{Name: args[1], Episode: epnum}
 
@@ -96,6 +108,8 @@ func newUpdate(args []string) {
 				discord.ChannelMessageSend(channel, newMessage)
 			}
 		}
+
+		return true
 	} else if !entry.Exists() {
 		// If this series does not exist in the database yet
 		// Insert it into the database
@@ -111,5 +125,9 @@ func newUpdate(args []string) {
 		for _, channel := range discordCfg.AnimeChannels {
 			discord.ChannelMessageSend(channel, newMessage)
 		}
+
+		return true
 	}
+
+	return false
 }

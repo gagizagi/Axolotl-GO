@@ -83,3 +83,19 @@ func requireEnvVars(args ...string) {
 		}
 	}
 }
+
+// tickerHelper funs a function in intervals
+// d is the duration betwen function execution
+// f is the executing function
+// runFirst true will run a function once first before starting an ticker
+func tickerHelper(d time.Duration, f func(), runFirst bool) {
+	ticker := time.NewTicker(d)
+
+	if runFirst {
+		f()
+	}
+
+	for range ticker.C {
+		f()
+	}
+}
