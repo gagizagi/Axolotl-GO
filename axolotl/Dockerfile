@@ -3,9 +3,6 @@ FROM golang:1.8-jessie
 # install glide
 RUN go get github.com/Masterminds/glide
 
-# install gin
-RUN go get github.com/codegangsta/gin
-
 # create a working directory
 WORKDIR /go/src/app
 

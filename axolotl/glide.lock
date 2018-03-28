@@ -1,8 +1,8 @@
 hash: bdf5c0b43903ad8f1246f2cdfe547d87d5dcc3a4055c326109e5a2a40514e3e3
-updated: 2018-03-20T01:49:05.551019896Z
+updated: 2018-03-28T09:12:26.7806457+02:00
 imports:
 - name: github.com/andybalholm/cascadia
-  version: 349dd0209470eabd9514242c688c403c0926d266
+  version: 901648c87902174f774fac311d7f176f8647bdaa
 - name: github.com/bwmarrin/discordgo
   version: 8d5ab59c63e553fd2030706008a806a8b553188c
 - name: github.com/eknkc/amber
@@ -10,22 +10,50 @@ imports:
   subpackages:
   - parser
 - name: github.com/gorilla/websocket
-  version: 4ac909741dfa57448bfadfdbca0cf7eeaa68f0e2
+  version: eb925808374e5ca90c83401a40d711dc08c0c0f6
+- name: github.com/mmcdole/gofeed
+  version: 0a05f076cc7ae8b762c04ad09565f029364545ce
+  subpackages:
+  - atom
+  - extensions
+  - internal/shared
+  - rss
+- name: github.com/mmcdole/goxpp
+  version: 77e4a51a73ed99ee3f33c1474dc166866304acbd
 - name: github.com/PuerkitoBio/goquery
-  version: 09540e565986583836b5fc792fe951ec5fd201dd
-- name: github.com/thoj/go-ircevent
-  version: db5bd176f7c6f4b2f15c46142fdc8319a365bf6e
+  version: ea1bc64a63088ac2bbf1a2edcae38413794a7710
 - name: golang.org/x/crypto
-  version: 5119cf507ed5294cc409c092980c7497ee5d6fd2
+  version: 88942b9c40a4c9d203b82b3731787b672d6e809b
   subpackages:
   - nacl/secretbox
   - poly1305
   - salsa20/salsa
 - name: golang.org/x/net
-  version: f5dfe339be1d06f81b22525fe34671ee7d2c8904
+  version: 6078986fec03a1dcc236c34816c71b0e05018fda
   subpackages:
   - html
   - html/atom
+  - html/charset
+- name: golang.org/x/text
+  version: ece95c760240037f89ebcbdd7155ac8cb52e38fa
+  subpackages:
+  - encoding
+  - encoding/charmap
+  - encoding/htmlindex
+  - encoding/internal
+  - encoding/internal/identifier
+  - encoding/japanese
+  - encoding/korean
+  - encoding/simplifiedchinese
+  - encoding/traditionalchinese
+  - encoding/unicode
+  - internal/language
+  - internal/language/compact
+  - internal/tag
+  - internal/utf8internal
+  - language
+  - runes
+  - transform
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
