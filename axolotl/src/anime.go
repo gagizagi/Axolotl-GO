@@ -177,7 +177,7 @@ func (a *anime) GetHref() (success int) {
 
 	doc, err := goquery.NewDocument( /*scrapper + */ target)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	} else {
 		doc.Find(".ind-show.linkful").Each(func(i int, s *goquery.Selection) {
 			name, _ := s.Find("a").Attr("title")

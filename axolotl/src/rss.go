@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strconv"
 	"time"
@@ -46,7 +47,7 @@ func rssReader() {
 // will recover from any panics during RSS URL parsing
 func rssReaderCleanup() {
 	if r := recover(); r != nil {
-		fmt.Println(r)
+		log.Println(r)
 	}
 }
 
