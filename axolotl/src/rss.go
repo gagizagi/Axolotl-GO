@@ -36,9 +36,11 @@ func rssReader() {
 
 		// If there is a new RSS entry published since last update date
 		// handle it with newUpdate() function
+		// update cutoff time with the latest update time
 		if relevantTitle && relevantDate {
 			regexArray := titleRegex.FindStringSubmatch(feed.Items[i].Title)
 			newUpdate(regexArray)
+			cutoff = *feed.Items[i].PublishedParsed
 		}
 	}
 }
