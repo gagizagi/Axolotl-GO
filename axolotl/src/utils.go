@@ -74,8 +74,8 @@ func removeItem(slice []string, item string) []string {
 	return slice
 }
 
-//checks if any of the provided required ENV variables is missing
-//logs the error and exits the program if any of them is missing
+// requireEnvVars checks if any of the required ENV variables are missing
+// logs the error and exits the program if any of them are missing
 func requireEnvVars(args ...string) {
 	for _, v := range args {
 		if os.Getenv(v) == "" {
