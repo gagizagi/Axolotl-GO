@@ -19,7 +19,7 @@ var (
 )
 
 func rssReader() {
-	defer rssReaderCleanup()
+	defer panicRecovery()
 
 	// Parse the RSS URL
 	fp := gofeed.NewParser()
@@ -28,18 +28,19 @@ func rssReader() {
 		panic(fmt.Sprintf("Error trying to parse RSS feed URL: %s - %s", rssURL, err))
 	}
 
-	// Updated titles
+	// Array of updated objects in this function interval
 	var titleUpdates []string
 
-	//Iterates through the RSS feed items in reverse order
+	// Iterate through the RSS feed items in reverse order
 	for i := len(feed.Items) - 1; i >= 0; i-- {
-		//True if the publish time/date of this feed item is after the cutoff time/date
+		// True if the publish time/date of this feed item is after the cutoff time/date
 		relevantDate := feed.Items[i].PublishedParsed.After(cutoff)
-		//True if the title of this feed item matches the regular expression
+		// True if the title of this feed item matches the regular expression
 		relevantTitle := titleRegex.MatchString(feed.Items[i].Title)
 
 		// If there is a new RSS entry published since last update date
 		// handle it with newUpdate() function
+		// if there is a new entry that doesn't match the regex log it
 		// update cutoff time with the latest update time
 		if relevantTitle && relevantDate {
 			regexArray := titleRegex.FindStringSubmatch(feed.Items[i].Title)
@@ -47,23 +48,19 @@ func rssReader() {
 
 			if ok {
 				titleUpdates = appendUnique(titleUpdates, regexArray[1])
-				cutoff = *feed.Items[i].PublishedParsed
 			}
 		} else if relevantDate && !relevantTitle {
 			log.Println("Error trying to match this RSS feed item title:", feed.Items[i].Title)
+		}
+
+		if relevantDate {
+			// Update the cutoff time for old feed entries
+			cutoff = *feed.Items[i].PublishedParsed
 		}
 	}
 
 	if len(titleUpdates) > 0 {
 		log.Printf("Updated %d anime entries: %s", len(titleUpdates), strings.Join(titleUpdates, ", "))
-	}
-}
-
-// rssReaderCleanup
-// will recover from any panics during RSS URL parsing
-func rssReaderCleanup() {
-	if r := recover(); r != nil {
-		log.Println(r)
 	}
 }
 
