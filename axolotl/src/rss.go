@@ -49,6 +49,8 @@ func rssReader() {
 				titleUpdates = appendUnique(titleUpdates, regexArray[1])
 				cutoff = *feed.Items[i].PublishedParsed
 			}
+		} else if relevantDate && !relevantTitle {
+			log.Println("Error trying to match this RSS feed item title:", feed.Items[i].Title)
 		}
 	}
 
