@@ -1,140 +1,78 @@
 package main
 
-import (
-	"fmt"
-	"strings"
+import "strings"
 
-	"github.com/bwmarrin/discordgo"
-)
+// HELPMESSAGE string lists all discord chat commands for this bot
+// already formatted as a discord string
+const HELPMESSAGE string = "***LIST OF BOT COMMANDS***\n" +
+	"Fields in [] are optional\n" +
+	"Fields in <> are mandatory\n\n" +
+	"```" +
+	"!help [bot] (Lists all bot commands)\n" +
+	"!uptime [bot](Prints current bot uptime)\n" +
+	"!sub <id> (Subscribe to anime and get notified when a new episode is released)\n" +
+	"!unsub <id> (Unsubscribe from anime)\n" +
+	"!mysubs (List all the anime you are subscribed to)\n" +
+	"!info [bot] (Prints bot information)" +
+	"```\n" +
+	"Full anime list at https://axolotl.gazzy.online/ \n" +
+	"For issues and suggestions go to https://github.com/gagizagi/Axolotl-GO"
 
-//discordMsgHandler is a handler function for incomming discord messages
-func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	botMessages++
+// helpCommand responds to discord text command 'help'
+// will respond on discord channel c (same channel as the received message)
+// response text is the HELPMESSAGE constant (list of all bot commands)
+func helpCommand(c string) {
+	msgChan <- msgObject{
+		Channel: c,
+		Message: HELPMESSAGE,
+	}
+}
 
-	/*TODO: Add counter for !w command to track number of calls.
-	Limit for this OWM api key is 600 calls per 10min AND 50k calls a day.
-	*/
-
-	//Split messages into arguments
-	args := strings.Fields(m.Content)
-	//Check if author is admin
-	boss := m.Author.ID == discordCfg.Boss
-	//Check if second argument is this bots name
-	botcheck := (len(args) > 1 && strings.ToUpper(args[1]) == discordCfg.Name)
-	//Check if message is relevant to the bot
-	//i.e message starts with '!' followed by a word
-	relevant := relevantRegex.MatchString(m.Content)
-
-	//If message is relevant process it otherwise leave this function
-	//TODO: Refactor this into something more readable
-	if relevant {
-		botResponses++
-		switch strings.ToUpper(args[0]) {
-
-		//!HELP [string]
-		//Can optionally include bots name as second argument
-		case "!HELP":
-			if len(args) > 1 {
-				if strings.ToUpper(args[1]) == discordCfg.Name {
-					s.ChannelMessageSend(m.ChannelID, discordHelp)
-				}
-			} else {
-				s.ChannelMessageSend(m.ChannelID, discordHelp)
+// subCommand is called when the user tries to subscribe to an anime
+// via the 'sub <ID>' text command
+// will subscribe the user if the anime exists and return a message
+// will return an error message to the user if the anime does not exist
+// response is sent on the same channel as the received message
+// TODO: add responses when format of the command is wrong
+// or user is already a sub
+func subCommand(args []string, authorID string, channelID string) {
+	if len(args) >= 2 {
+		newAnime := anime{ID: strings.ToLower(args[1])}
+		if newAnime.Exists() {
+			newAnime.AddSub(authorID)
+			msgChan <- msgObject{
+				Channel: channelID,
+				Message: "Successfully subscribed to " + newAnime.Name,
 			}
-
-		//!SUB anime.id
-		//anime.id is the id of the anime (string with length of 3 chars)
-		case "!SUB":
-			if len(args) >= 2 {
-				newAnime := anime{ID: strings.ToLower(args[1])}
-				if newAnime.Exists() {
-					newAnime.AddSub(m.Author.ID)
-					s.ChannelMessageSend(m.ChannelID,
-						"Successfully subscribed to "+newAnime.Name)
-				} else {
-					s.ChannelMessageSend(m.ChannelID, "Invalid ID")
-				}
+		} else {
+			msgChan <- msgObject{
+				Channel: channelID,
+				Message: "Invalid ID",
 			}
+		}
+	}
+}
 
-		//!UNSUB anime.id
-		//anime.id is the id of the anime (string with length of 3 chars)
-		case "!UNSUB":
-			if len(args) >= 2 {
-				newAnime := anime{ID: strings.ToLower(args[1])}
-				if newAnime.Exists() {
-					newAnime.RemoveSub(m.Author.ID)
-					s.ChannelMessageSend(m.ChannelID,
-						"Successfully unsubscribed from "+newAnime.Name)
-				} else {
-					s.ChannelMessageSend(m.ChannelID, "Invalid ID")
-				}
+// subCommand is called when the user tries to unsubscribe from an anime
+// via the 'unsub <ID>' text command
+// will unsubscribe the user if the anime exists and return a message
+// will return an error message to the user if the anime does not exist
+// response is sent on the same channel as the received message
+// TODO: add responses when format of the command is wrong
+// or user is not a sub
+func unsubCommand(args []string, authorID string, channelID string) {
+	if len(args) >= 2 {
+		newAnime := anime{ID: strings.ToLower(args[1])}
+		if newAnime.Exists() {
+			newAnime.RemoveSub(authorID)
+			msgChan <- msgObject{
+				Channel: channelID,
+				Message: "Successfully unsubscribed from " + newAnime.Name,
 			}
-
-		//!MYSUBS
-		//Lists all series this user is subscriberd to in format "SeriesName(id)"
-		case "!MYSUBS":
-			subs := fmt.Sprintf("<@%s> is subscribed to: ", m.Author.ID)
-			animeArray := getAnimeListForUser(m.Author.ID)
-
-			for i, anime := range animeArray {
-				if i > 0 {
-					subs += ", "
-				}
-				subs += fmt.Sprintf("%s(%s)", anime.Name, anime.ID)
-			}
-
-			s.ChannelMessageSend(m.ChannelID, subs)
-
-		//!UPTIME [string]
-		//Can optionally include bots name as second argument
-		case "!UPTIME":
-			if len(args) > 1 {
-				if strings.ToUpper(args[1]) == discordCfg.Name {
-					s.ChannelMessageSend(m.ChannelID, "Current uptime is "+getUptime())
-				}
-			} else {
-				s.ChannelMessageSend(m.ChannelID, "Current uptime is "+getUptime())
-			}
-
-		//!P string
-		//Sets the 'currently playing' state of the bot
-		//will only work for admin of the bot
-		case "!P":
-			if boss {
-				if len(args) > 1 {
-					var game string
-					for i := 1; i < len(args); i++ {
-						game += args[i] + " "
-					}
-					game = game[:len(game)-1]
-					discord.UpdateStatus(0, game)
-				} else {
-					discord.UpdateStatus(0, "")
-				}
-			}
-
-		//!INFO [string]
-		//Can optionally include bots name as second argument
-		//Lists bot usage and general information
-		case "!INFO":
-			if len(args) > 1 {
-				if strings.ToUpper(args[1]) == discordCfg.Name {
-					s.ChannelMessageSend(m.ChannelID, getInfo())
-				}
-			} else {
-				s.ChannelMessageSend(m.ChannelID, getInfo())
-			}
-
-		//!GUILDS [string]
-		//Can optionally include bots name as second argument
-		//Lists all the guilds this bot is a part of
-		//will only work for admin of the bot
-		//FIXME: https://github.com/gagizagi/Axolotl-GO/issues/6
-		case "!GUILDS":
-			if boss && (botcheck || len(args) == 1) {
-				s.ChannelMessageSend(m.ChannelID,
-					fmt.Sprintf("Currently in %d guilds: %s",
-						len(discordCfg.Guilds), strings.Join(discordCfg.Guilds, ", ")))
+		} else {
+			msgChan <- msgObject{
+				Channel: channelID,
+				Message: "Invalid ID",
 			}
 		}
 	}

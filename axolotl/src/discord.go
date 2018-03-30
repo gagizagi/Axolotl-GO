@@ -18,33 +18,22 @@ type discordConfig struct {
 	Debug         bool
 }
 
-//Declare constants
-const (
-	//Help string lists all discord chat commands for this bot
-	discordHelp string = "***LIST OF BOT COMMANDS***\n" +
-		"Fields in [] are optional\n" +
-		"Fields in <> are mandatory\n\n" +
-		"```" +
-		"!help [bot] (Lists all bot commands)\n" +
-		"!uptime [bot](Prints current bot uptime)\n" +
-		"!sub <id> (Subscribe to anime and get notified when a new episode is released)\n" +
-		"!unsub <id> (Unsubscribe from anime)\n" +
-		"!mysubs (List all the anime you are subscribed to)\n" +
-		"!info [bot] (Prints bot information)" +
-		"```\n" +
-		"Full anime list at https://axolotl.gazzy.online/ \n" +
-		"For issues and suggestions go to https://github.com/gagizagi/Axolotl-GO"
-)
+type msgObject struct {
+	Message string
+	Channel string
+}
 
 //Declare variables
 var (
 	discord       *discordgo.Session           //Discord client
 	discordCfg    *discordConfig               //Discord options
 	relevantRegex = regexp.MustCompile(`^!\w`) //Discord regex msg parser
+	msgChan       chan msgObject
 )
 
 //Starts discord connection and sets handlers and behavior
 func discordStart(c *discordConfig) {
+	msgChan = make(chan msgObject)
 	//Updates discordCfg variable with c parameter data
 	//For future use outside this function
 	discordCfg = c
@@ -66,4 +55,14 @@ func discordStart(c *discordConfig) {
 	discord.AddHandler(discordLeaveChannelHandler)
 	discord.AddHandler(discordChannelUpdateHandler)
 	discord.Open() //Opens discord connection
+
+	discordMsgDispatcher(msgChan)
+}
+
+// discordMsgDispather receives discord message strings through a chan
+// and sends them to appropriate discord text channels
+func discordMsgDispatcher(c <-chan msgObject) {
+	for msg := range c {
+		discord.ChannelMessageSend(msg.Channel, msg.Message)
+	}
 }
