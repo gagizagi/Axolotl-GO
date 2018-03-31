@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -23,21 +22,6 @@ func init() {
 
 func getUptime() string {
 	return time.Now().Sub(botStartTime).String()
-}
-
-//getInfo returns the bot infromation as a discord formated string
-func getInfo() (result string) {
-	result += "```"
-	result += fmt.Sprintf("Name: %s\n", discordCfg.Name)
-	result += fmt.Sprintf("Uptime: %s\n", getUptime())
-	result += fmt.Sprintf("Guilds: %d\n", len(discordCfg.Guilds))
-	result += fmt.Sprintf("Anime channels: %d\n", len(discordCfg.AnimeChannels))
-	result += fmt.Sprintf("Unique subscribers: %d\n", getUniqueSubs())
-	result += fmt.Sprintf("Messages read: %d\n", botMessages)
-	result += fmt.Sprintf("Message responses: %d\n", botResponses)
-	result += "```"
-
-	return
 }
 
 //getUniqueSubs returs the amount of unique subscribers in the database

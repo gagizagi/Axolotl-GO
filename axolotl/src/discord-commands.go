@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // HELPMESSAGE string lists all discord chat commands for this bot
 // already formatted as a discord string
@@ -74,6 +77,95 @@ func unsubCommand(args []string, authorID string, channelID string) {
 				Channel: channelID,
 				Message: "Invalid ID",
 			}
+		}
+	}
+}
+
+// mySubs responds with a list of all the anime the requesting user
+// is subscribed to
+// response is sent on the same channel as the received message
+func mySubs(authorID string, channelID string) {
+	var subs []string
+	animeArray := getAnimeListForUser(authorID)
+
+	for _, a := range animeArray {
+		subs = append(subs, fmt.Sprintf("%s(%s)", a.Name, a.ID))
+	}
+
+	result := fmt.Sprintf("<@%s> is subscribed to %d series: %s",
+		authorID, len(animeArray), strings.Join(subs, ", "))
+
+	msgChan <- msgObject{
+		Message: result,
+		Channel: channelID,
+	}
+}
+
+// uptime responds with the current uptime of the bot
+// response is sent on the same channel as the received message
+func uptime(channelID string) {
+	msgChan <- msgObject{
+		Message: getUptime(),
+		Channel: channelID,
+	}
+}
+
+// setStatus sets the bots status
+// admin only command
+// sending empty command (!p) will set it to no status
+func setStatus(args []string) {
+	if len(args) > 1 {
+		game := strings.Join(args[1:len(args)], " ")
+		discord.UpdateStatus(0, game)
+	} else {
+		discord.UpdateStatus(0, "")
+	}
+}
+
+// botInfo responds with the different bot statistics
+// response is sent on the same channel as the received message
+func botInfo(channelID string) {
+	result := "```"
+	result += fmt.Sprintf("Name: %s\n", discordCfg.Name)
+	result += fmt.Sprintf("Uptime: %s\n", getUptime())
+	result += fmt.Sprintf("Guilds: %d\n", len(discordCfg.Guilds))
+	result += fmt.Sprintf("Anime channels: %d\n", len(discordCfg.AnimeChannels))
+	result += fmt.Sprintf("Unique subscribers: %d\n", getUniqueSubs())
+	result += fmt.Sprintf("Messages read: %d\n", botMessages)
+	result += fmt.Sprintf("Message responses: %d\n", botResponses)
+	result += "```"
+
+	msgChan <- msgObject{
+		Message: result,
+		Channel: channelID,
+	}
+}
+
+// guilds responds with a list of all the guilds this bot is currently in
+// admin only command because it is potentially multiple messages long
+// TODO: test this command on production instance of the bot
+func guilds(channelID string) {
+	result := fmt.Sprintf("Bot is currently in %d guilds: ",
+		len(discordCfg.Guilds))
+
+	for i, guild := range discordCfg.Guilds {
+		if i == 0 {
+			result += " " + guild
+		} else if (len(result) + len(guild) + 2) <= 2000 {
+			result += ", " + guild
+		} else {
+			msgChan <- msgObject{
+				Message: result,
+				Channel: channelID,
+			}
+			result = ""
+		}
+	}
+
+	if result != "" {
+		msgChan <- msgObject{
+			Message: result,
+			Channel: channelID,
 		}
 	}
 }

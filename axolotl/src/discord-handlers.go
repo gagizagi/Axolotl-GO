@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -81,7 +80,7 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//Check if author is admin
 	boss := m.Author.ID == discordCfg.Boss
 	//Check if second argument is this bots name
-	botcheck := (len(args) > 1 && strings.ToUpper(args[1]) == discordCfg.Name)
+	// TODO: remove this? botcheck := (len(args) > 1 && strings.ToUpper(args[1]) == discordCfg.Name)
 	//Check if message is relevant to the bot
 	//i.e message starts with '!' followed by a word
 	relevant := relevantRegex.MatchString(m.Content)
@@ -101,82 +100,42 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		case "!SUB":
 			subCommand(args, m.Author.ID, m.ChannelID)
 
-		//!UNSUB anime.id
-		//anime.id is the id of the anime (string with length of 3 chars)
+		// !UNSUB anime.id
+		// anime.id is the id of the anime (string with length of 3 chars)
 		case "!UNSUB":
 			unsubCommand(args, m.Author.ID, m.ChannelID)
 
-		//!MYSUBS
-		//Lists all series this user is subscriberd to in format "SeriesName(id)"
+		// !MYSUBS
+		// Lists all series this user is subscriberd to in format "SeriesName(id)"
 		case "!MYSUBS":
-			subs := fmt.Sprintf("<@%s> is subscribed to: ", m.Author.ID)
-			animeArray := getAnimeListForUser(m.Author.ID)
+			mySubs(m.Author.ID, m.ChannelID)
 
-			for i, anime := range animeArray {
-				if i > 0 {
-					subs += ", "
-				}
-				subs += fmt.Sprintf("%s(%s)", anime.Name, anime.ID)
-			}
-
-			s.ChannelMessageSend(m.ChannelID, subs)
-
-		//!UPTIME [string]
-		//Can optionally include bots name as second argument
+		// !UPTIME
+		// Can optionally include bots name as second argument
 		case "!UPTIME":
-			if len(args) > 1 {
-				if strings.ToUpper(args[1]) == discordCfg.Name {
-					s.ChannelMessageSend(m.ChannelID, "Current uptime is "+getUptime())
-				}
-			} else {
-				s.ChannelMessageSend(m.ChannelID, "Current uptime is "+getUptime())
-			}
+			uptime(m.ChannelID)
 
-		//!P string
-		//Sets the 'currently playing' state of the bot
-		//will only work for admin of the bot
+		// !P [string]
+		// Sets the 'currently playing' state of the bot
+		// will only work for admin of the bot
 		case "!P":
 			if boss {
-				if len(args) > 1 {
-					var game string
-					for i := 1; i < len(args); i++ {
-						game += args[i] + " "
-					}
-					game = game[:len(game)-1]
-					discord.UpdateStatus(0, game)
-				} else {
-					discord.UpdateStatus(0, "")
-				}
+				setStatus(args)
 			}
 
-		//!INFO [string]
-		//Can optionally include bots name as second argument
-		//Lists bot usage and general information
+		// !INFO
+		// Can optionally include bots name as second argument
+		// Lists bot usage and general information
 		case "!INFO":
-			if len(args) > 1 {
-				if strings.ToUpper(args[1]) == discordCfg.Name {
-					s.ChannelMessageSend(m.ChannelID, getInfo())
-				}
-			} else {
-				s.ChannelMessageSend(m.ChannelID, getInfo())
-			}
+			botInfo(m.ChannelID)
 
-		//!GUILDS [string]
-		//Can optionally include bots name as second argument
-		//Lists all the guilds this bot is a part of
-		//will only work for admin of the bot
-		//FIXME: https://github.com/gagizagi/Axolotl-GO/issues/6
+		// !GUILDS
+		// Can optionally include bots name as second argument
+		// Lists all the guilds this bot is a part of
+		// will only work for admin of the bot
 		case "!GUILDS":
-			if boss && (botcheck || len(args) == 1) {
-				s.ChannelMessageSend(m.ChannelID,
-					fmt.Sprintf("Currently in %d guilds: %s",
-						len(discordCfg.Guilds), strings.Join(discordCfg.Guilds, ", ")))
-			}
-
-		case "!TEST":
-			msgChan <- msgObject{
-				Message: "hello",
-				Channel: m.ChannelID,
+			if boss {
+				guilds(m.ChannelID)
 			}
 		}
 	}

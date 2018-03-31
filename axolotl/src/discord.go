@@ -56,13 +56,17 @@ func discordStart(c *discordConfig) {
 	discord.AddHandler(discordChannelUpdateHandler)
 	discord.Open() //Opens discord connection
 
-	discordMsgDispatcher(msgChan)
+	go discordMsgDispatcher(msgChan)
 }
 
 // discordMsgDispather receives discord message strings through a chan
 // and sends them to appropriate discord text channels
 func discordMsgDispatcher(c <-chan msgObject) {
 	for msg := range c {
-		discord.ChannelMessageSend(msg.Channel, msg.Message)
+		_, err := discord.ChannelMessageSend(msg.Channel, msg.Message)
+		if err != nil {
+			log.Printf("\nError sending discord message on channel %s: %s - %s",
+				msg.Channel, msg.Message, err)
+		}
 	}
 }
