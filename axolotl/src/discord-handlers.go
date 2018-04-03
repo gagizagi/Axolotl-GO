@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -71,72 +72,51 @@ func discordLeaveGuildHandler(s *discordgo.Session, g *discordgo.GuildDelete) {
 	discordCfg.Guilds = removeItem(discordCfg.Guilds, g.Name)
 }
 
-//discordMsgHandler is a handler function for incomming discord messages
+// discordMsgHandler is a handler function for incoming discord messages
 func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	botMessages++
+	// Increment the number of messages this bot has read
+	botReads++
 
-	//Split messages into arguments
-	args := strings.Fields(m.Content)
-	//Check if author is admin
-	boss := m.Author.ID == discordCfg.Boss
-	//Check if second argument is this bots name
-	// TODO: remove this? botcheck := (len(args) > 1 && strings.ToUpper(args[1]) == discordCfg.Name)
-	//Check if message is relevant to the bot
-	//i.e message starts with '!' followed by a word
-	relevant := relevantRegex.MatchString(m.Content)
+	// Split received message into different parts (space seperated)
+	// prefix is the first char of the first part
+	// command is the rest of first part (not including first char)
+	// args is an array of all parts after first one
+	var prefix string
+	var command string
+	var args []string
+	args = strings.Fields(m.Content)
+	if len(args) > 0 {
+		prefix = args[0][0:1]
+		command = args[0][1:]
+		args = strings.Fields(m.Content)[1:]
+	}
 
-	//If message is relevant process it otherwise leave this function
-	//TODO: Refactor this into something more readable
-	if relevant {
-		botResponses++
-		switch strings.ToUpper(args[0]) {
+	// If bot needs to parse this message, parse it
+	// otherwise ignore it and get out of the function
+	if prefix == "!" {
+		// FIXME: dev only
+		fmt.Printf("\nCommand received:\nPrefix: %s\nCommand: %s\nargs: ",
+			prefix, command)
+		fmt.Print(args)
 
-		// !HELP
-		case "!HELP":
-			helpCommand(m.ChannelID)
+		// Increment the number of messages this bot has parsed
+		botMessages++
 
-		// !SUB anime.id
-		// anime.id is the id of the anime (string with length of 3 chars)
-		case "!SUB":
-			subCommand(args, m.Author.ID, m.ChannelID)
-
-		// !UNSUB anime.id
-		// anime.id is the id of the anime (string with length of 3 chars)
-		case "!UNSUB":
-			unsubCommand(args, m.Author.ID, m.ChannelID)
-
-		// !MYSUBS
-		// Lists all series this user is subscriberd to in format "SeriesName(id)"
-		case "!MYSUBS":
-			mySubs(m.Author.ID, m.ChannelID)
-
-		// !UPTIME
-		// Can optionally include bots name as second argument
-		case "!UPTIME":
-			uptime(m.ChannelID)
-
-		// !P [string]
-		// Sets the 'currently playing' state of the bot
-		// will only work for admin of the bot
-		case "!P":
-			if boss {
-				setStatus(args)
-			}
-
-		// !INFO
-		// Can optionally include bots name as second argument
-		// Lists bot usage and general information
-		case "!INFO":
-			botInfo(m.ChannelID)
-
-		// !GUILDS
-		// Can optionally include bots name as second argument
-		// Lists all the guilds this bot is a part of
-		// will only work for admin of the bot
-		case "!GUILDS":
-			if boss {
-				guilds(m.ChannelID)
-			}
+		if f := mapCommand(commandList, command); f != nil {
+			f(args, m)
 		}
 	}
+}
+
+// mapCommand takes discord command string and maps it to a function with matching key
+// Returns the discordCommandHandler function if there is a match
+// Returns nil if there is no matching function found
+func mapCommand(m map[string]discordCommandHandler, c string) discordCommandHandler {
+	for k, v := range m {
+		if strings.ToUpper(k) == strings.ToUpper(c) {
+			return v
+		}
+	}
+
+	return nil
 }

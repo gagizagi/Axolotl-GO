@@ -37,7 +37,7 @@ Bot has 99.9% uptime and is currently in daily use on over 200 servers.
 !sub *id*|Subscribe to the anime series to receive @mentions whenever a new episode is released.|!sub yls|Get full list of series [here](https://axolotl.gazzy.online/)
 !unsub *id*|Unsubscribe from the anime series|!unsub 6aj|Get full list of series [here](https://axolotl.gazzy.online/)
 !mysubs|Lists all the anime you are subscribed to
-!p *string*|Sets the game bot is "playing"|!p minecraft|Admin only
+!status *string*|Sets the game bot is "playing"|!p minecraft|Admin only
 !info|Returns information about the bot
 !guilds|Returns a list of all the guilds this bot is in| |Admin only
 

@@ -11,8 +11,9 @@ import (
 
 var (
 	botStartTime time.Time
-	botResponses int
+	botReads     int
 	botMessages  int
+	botResponses int
 )
 
 func init() {

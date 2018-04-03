@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 // HELPMESSAGE string lists all discord chat commands for this bot
@@ -24,9 +26,9 @@ const HELPMESSAGE string = "***LIST OF BOT COMMANDS***\n" +
 // helpCommand responds to discord text command 'help'
 // will respond on discord channel c (same channel as the received message)
 // response text is the HELPMESSAGE constant (list of all bot commands)
-func helpCommand(c string) {
+func helpCommand(args []string, m *discordgo.MessageCreate) {
 	msgChan <- msgObject{
-		Channel: c,
+		Channel: m.ChannelID,
 		Message: HELPMESSAGE,
 	}
 }
@@ -37,19 +39,20 @@ func helpCommand(c string) {
 // will return an error message to the user if the anime does not exist
 // response is sent on the same channel as the received message
 // TODO: add responses when format of the command is wrong
+// TODO: make it possible to sub to an array of ids with one command
 // or user is already a sub
-func subCommand(args []string, authorID string, channelID string) {
-	if len(args) >= 2 {
-		newAnime := anime{ID: strings.ToLower(args[1])}
+func subCommand(args []string, m *discordgo.MessageCreate) {
+	if len(args) > 0 {
+		newAnime := anime{ID: strings.ToLower(args[0])}
 		if newAnime.Exists() {
-			newAnime.AddSub(authorID)
+			newAnime.AddSub(m.Author.ID)
 			msgChan <- msgObject{
-				Channel: channelID,
+				Channel: m.ChannelID,
 				Message: "Successfully subscribed to " + newAnime.Name,
 			}
 		} else {
 			msgChan <- msgObject{
-				Channel: channelID,
+				Channel: m.ChannelID,
 				Message: "Invalid ID",
 			}
 		}
@@ -62,19 +65,20 @@ func subCommand(args []string, authorID string, channelID string) {
 // will return an error message to the user if the anime does not exist
 // response is sent on the same channel as the received message
 // TODO: add responses when format of the command is wrong
+// TODO: make it possible to unsub from an array of ids with one command
 // or user is not a sub
-func unsubCommand(args []string, authorID string, channelID string) {
-	if len(args) >= 2 {
-		newAnime := anime{ID: strings.ToLower(args[1])}
+func unsubCommand(args []string, m *discordgo.MessageCreate) {
+	if len(args) > 0 {
+		newAnime := anime{ID: strings.ToLower(args[0])}
 		if newAnime.Exists() {
-			newAnime.RemoveSub(authorID)
+			newAnime.RemoveSub(m.Author.ID)
 			msgChan <- msgObject{
-				Channel: channelID,
+				Channel: m.ChannelID,
 				Message: "Successfully unsubscribed from " + newAnime.Name,
 			}
 		} else {
 			msgChan <- msgObject{
-				Channel: channelID,
+				Channel: m.ChannelID,
 				Message: "Invalid ID",
 			}
 		}
@@ -84,38 +88,39 @@ func unsubCommand(args []string, authorID string, channelID string) {
 // mySubs responds with a list of all the anime the requesting user
 // is subscribed to
 // response is sent on the same channel as the received message
-func mySubs(authorID string, channelID string) {
+func mySubs(args []string, m *discordgo.MessageCreate) {
 	var subs []string
-	animeArray := getAnimeListForUser(authorID)
+	animeArray := getAnimeListForUser(m.Author.ID)
 
 	for _, a := range animeArray {
 		subs = append(subs, fmt.Sprintf("%s(%s)", a.Name, a.ID))
 	}
 
 	result := fmt.Sprintf("<@%s> is subscribed to %d series: %s",
-		authorID, len(animeArray), strings.Join(subs, ", "))
+		m.Author.ID, len(animeArray), strings.Join(subs, ", "))
 
 	msgChan <- msgObject{
 		Message: result,
-		Channel: channelID,
+		Channel: m.ChannelID,
 	}
 }
 
 // uptime responds with the current uptime of the bot
 // response is sent on the same channel as the received message
-func uptime(channelID string) {
+func uptime(args []string, m *discordgo.MessageCreate) {
 	msgChan <- msgObject{
 		Message: getUptime(),
-		Channel: channelID,
+		Channel: m.ChannelID,
 	}
 }
 
 // setStatus sets the bots status
 // admin only command
 // sending empty command (!p) will set it to no status
-func setStatus(args []string) {
-	if len(args) > 1 {
-		game := strings.Join(args[1:len(args)], " ")
+func setStatus(args []string, m *discordgo.MessageCreate) {
+	// Only proceed if the message sender is discord admin
+	if len(args) > 0 && m.Author.ID == discordCfg.Boss {
+		game := strings.Join(args[0:len(args)], " ")
 		discord.UpdateStatus(0, game)
 	} else {
 		discord.UpdateStatus(0, "")
@@ -124,27 +129,33 @@ func setStatus(args []string) {
 
 // botInfo responds with the different bot statistics
 // response is sent on the same channel as the received message
-func botInfo(channelID string) {
+func botInfo(args []string, m *discordgo.MessageCreate) {
 	result := "```"
 	result += fmt.Sprintf("Name: %s\n", discordCfg.Name)
 	result += fmt.Sprintf("Uptime: %s\n", getUptime())
 	result += fmt.Sprintf("Guilds: %d\n", len(discordCfg.Guilds))
 	result += fmt.Sprintf("Anime channels: %d\n", len(discordCfg.AnimeChannels))
 	result += fmt.Sprintf("Unique subscribers: %d\n", getUniqueSubs())
-	result += fmt.Sprintf("Messages read: %d\n", botMessages)
-	result += fmt.Sprintf("Message responses: %d\n", botResponses)
+	result += fmt.Sprintf("Messages read: %d\n", botReads)
+	result += fmt.Sprintf("Messages parsed: %d\n", botMessages)
+	result += fmt.Sprintf("Message responses: %d\n", botResponses+1)
 	result += "```"
 
 	msgChan <- msgObject{
 		Message: result,
-		Channel: channelID,
+		Channel: m.ChannelID,
 	}
 }
 
 // guilds responds with a list of all the guilds this bot is currently in
 // admin only command because it is potentially multiple messages long
 // TODO: test this command on production instance of the bot
-func guilds(channelID string) {
+func guilds(args []string, m *discordgo.MessageCreate) {
+	// Only proceed if the message sender is discord admin
+	if m.Author.ID != discordCfg.Boss {
+		return
+	}
+
 	result := fmt.Sprintf("Bot is currently in %d guilds: ",
 		len(discordCfg.Guilds))
 
@@ -156,7 +167,7 @@ func guilds(channelID string) {
 		} else {
 			msgChan <- msgObject{
 				Message: result,
-				Channel: channelID,
+				Channel: m.ChannelID,
 			}
 			result = ""
 		}
@@ -165,7 +176,7 @@ func guilds(channelID string) {
 	if result != "" {
 		msgChan <- msgObject{
 			Message: result,
-			Channel: channelID,
+			Channel: m.ChannelID,
 		}
 	}
 }

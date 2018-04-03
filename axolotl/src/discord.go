@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"regexp"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -18,17 +17,18 @@ type discordConfig struct {
 	Debug         bool
 }
 
+type discordCommandHandler func([]string, *discordgo.MessageCreate)
+
 type msgObject struct {
 	Message string
 	Channel string
 }
 
-//Declare variables
 var (
-	discord       *discordgo.Session           //Discord client
-	discordCfg    *discordConfig               //Discord options
-	relevantRegex = regexp.MustCompile(`^!\w`) //Discord regex msg parser
-	msgChan       chan msgObject
+	discord     *discordgo.Session               // Discord client
+	discordCfg  *discordConfig                   // Discord options
+	msgChan     chan msgObject                   // Channel for dispatching discord messages
+	commandList map[string]discordCommandHandler // Maps command strings to appropriate handler functions
 )
 
 //Starts discord connection and sets handlers and behavior
@@ -56,6 +56,16 @@ func discordStart(c *discordConfig) {
 	discord.AddHandler(discordChannelUpdateHandler)
 	discord.Open() //Opens discord connection
 
+	commandList = make(map[string]discordCommandHandler)
+	commandList["HELP"] = helpCommand
+	commandList["SUB"] = subCommand
+	commandList["UNSUB"] = unsubCommand
+	commandList["MYSUBS"] = mySubs
+	commandList["UPTIME"] = uptime
+	commandList["STATUS"] = setStatus
+	commandList["INFO"] = botInfo
+	commandList["GUILDS"] = guilds
+
 	go discordMsgDispatcher(msgChan)
 }
 
@@ -63,8 +73,12 @@ func discordStart(c *discordConfig) {
 // and sends them to appropriate discord text channels
 func discordMsgDispatcher(c <-chan msgObject) {
 	for msg := range c {
+		// Increment the number of messages this bot has responded to
+		botResponses++
+
 		_, err := discord.ChannelMessageSend(msg.Channel, msg.Message)
 		if err != nil {
+			botResponses--
 			log.Printf("\nError sending discord message on channel %s: %s - %s",
 				msg.Channel, msg.Message, err)
 		}
