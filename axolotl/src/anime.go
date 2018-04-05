@@ -24,10 +24,12 @@ type anime struct {
 	Show       bool      `bson:"show"`
 }
 
-//LIMIT is a time constant for 15 Days
+// LIMIT is a time constant for 15 Days
+// used to hide entries not updated in a while from displaying on the website
 const LIMIT = 15 * 24 * time.Hour
 
-//Gets every anime in animeList db and returns it as AnimeList type
+// getAnimeList
+// Returns animeList of all anime in the database
 func getAnimeList() (result animeList) {
 	defer panicRecovery()
 
@@ -39,7 +41,8 @@ func getAnimeList() (result animeList) {
 	return
 }
 
-//Get every anime this user.id is subscribed to
+// getAnimeListForUser
+// Returns animeList of every anime this userID is subscribed to
 func getAnimeListForUser(userID string) (result animeList) {
 	defer panicRecovery()
 
@@ -60,10 +63,11 @@ func maintainAnimeList() {
 	hidden, updated := 0, 0
 	newAnimeList := getAnimeList()
 	now := time.Now()
+	doc := scrapeHS()
 
 	for _, a := range newAnimeList {
-		if len(a.Href) < 5 {
-			updated += a.GetHref() //TODO: Limit HS scraping to maximum 1 per maintanance, instead of 1 per empty href per maintanance
+		if len(a.Href) < 5 && doc != nil {
+			updated += a.GetHref(doc)
 		}
 		if now.Sub(a.LastUpdate) > LIMIT {
 			hidden += a.Hide()
@@ -89,9 +93,13 @@ func (a anime) Hide() (success int) {
 	defer panicRecovery()
 
 	success = 0
-
+	updateQuery := bson.M{
+		"$set": bson.M{
+			"show": false,
+		},
+	}
 	if a.Name != "" {
-		err := DBanimeList.Update(bson.M{"name": a.Name}, bson.M{"show": false})
+		err := DBanimeList.Update(bson.M{"name": a.Name}, updateQuery)
 
 		if err != nil {
 			panic(fmt.Sprintf("Error updating MongoDB document in anime method: %s - %s", "Hide", err))
@@ -99,7 +107,7 @@ func (a anime) Hide() (success int) {
 
 		success = 1
 	} else if a.ID != "" {
-		err := DBanimeList.Update(bson.M{"id": a.ID}, bson.M{"show": false})
+		err := DBanimeList.Update(bson.M{"id": a.ID}, updateQuery)
 
 		if err != nil {
 			panic(fmt.Sprintf("Error updating MongoDB document in anime method: %s - %s", "Hide", err))
@@ -116,6 +124,7 @@ func (a *anime) UpdateEp() {
 	updateQuery := bson.M{
 		"$set": bson.M{
 			"ep":         a.Episode,
+			"show":       true,
 			"lastUpdate": time.Now(),
 		},
 	}
@@ -128,7 +137,7 @@ func (a *anime) UpdateEp() {
 	DBanimeList.Find(bson.M{"name": a.Name}).Apply(change, a)
 }
 
-//Adds new sub Name to the db entry of Anime.Id
+// Adds new sub Name to the db entry of Anime.Id
 func (a *anime) AddSub(sub string) {
 	updateQuery := bson.M{
 		"$addToSet": bson.M{
@@ -144,7 +153,7 @@ func (a *anime) AddSub(sub string) {
 	DBanimeList.Find(bson.M{"id": a.ID}).Apply(change, a)
 }
 
-//Removes the sub from the db entry of Anime.Id
+// Removes the sub from the db entry of Anime.Id
 func (a *anime) RemoveSub(sub string) {
 	updateQuery := bson.M{
 		"$pull": bson.M{
@@ -176,33 +185,29 @@ func (a *anime) GenID() {
 	}
 }
 
-//Gets href for Anime.Name
-func (a *anime) GetHref() (success int) {
+// GetHref attempts to fetch the URL for this entry from doc
+// doc is a scraped website HTML
+// Returns 1 if it updated the href for this entry
+// Returns 0 if the href for this entry does not exist yet
+func (a *anime) GetHref(doc *goquery.Document) (success int) {
 	success = 0
-	//NOTE: Cloudflare scraping not needed for now
-	//scrapper := "http://scraper-422.rhcloud.com/?href="
-	target := "http://horriblesubs.info/current-season/"
 
-	doc, err := goquery.NewDocument( /*scrapper + */ target)
-	if err != nil {
-		log.Println(err)
-	} else {
-		doc.Find(".ind-show.linkful").Each(func(i int, s *goquery.Selection) {
-			name, _ := s.Find("a").Attr("title")
-			url, _ := s.Find("a").Attr("href")
-			if strings.ToLower(name) == strings.ToLower(a.Name) {
-				newHref := fmt.Sprintf("http://horriblesubs.info%s", url)
-				updateQuery := bson.M{
-					"$set": bson.M{
-						"href":       newHref,
-						"lastUpdate": time.Now(),
-					},
-				}
-				DBanimeList.Update(bson.M{"name": a.Name}, updateQuery)
-				success = 1
+	doc.Find(".ind-show.linkful").Each(func(i int, s *goquery.Selection) {
+		name, _ := s.Find("a").Attr("title")
+		url, _ := s.Find("a").Attr("href")
+		if strings.ToLower(name) == strings.ToLower(a.Name) {
+			newHref := fmt.Sprintf("http://horriblesubs.info%s", url)
+			updateQuery := bson.M{
+				"$set": bson.M{
+					"href":       newHref,
+					"lastUpdate": time.Now(),
+				},
 			}
-		})
-	}
+			DBanimeList.Update(bson.M{"name": a.Name}, updateQuery)
+			success = 1
+		}
+	})
+
 	return
 }
 

@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -97,4 +98,21 @@ func panicRecovery() {
 	if r := recover(); r != nil {
 		log.Println(r)
 	}
+}
+
+// scrapeHS scrapes the HorribleSubs website HTML
+// Returns a goquery document or nil if it fails
+func scrapeHS() *goquery.Document {
+	defer panicRecovery()
+
+	//NOTE: Cloudflare scraping not needed for now
+	//scrapper := "http://scraper-422.rhcloud.com/?href="
+	target := "http://horriblesubs.info/shows/"
+
+	doc, err := goquery.NewDocument( /*scrapper + */ target)
+	if err != nil {
+		panic(fmt.Sprintf("Error trying to scrape website: %s - %s", target, err))
+	}
+
+	return doc
 }
