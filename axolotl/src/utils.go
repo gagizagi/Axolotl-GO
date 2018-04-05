@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -25,19 +26,22 @@ func getUptime() string {
 	return time.Now().Sub(botStartTime).String()
 }
 
-//getUniqueSubs returs the amount of unique subscribers in the database
+// getUniqueSubs
+// Returns the number of unique subscribers in the database
 func getUniqueSubs() int {
+	defer panicRecovery()
+
 	var uniqueSubs []string
 	err := DBanimeList.Find(bson.M{}).Distinct("subs", &uniqueSubs)
 	if err != nil {
-		log.Print("MongoDB error: ", err)
+		panic(fmt.Sprintf("Error querying MongoDB in function: %s - %s", "getUniqueSubs", err))
 	}
 
 	return len(uniqueSubs)
 }
 
-//appendUnique is a function for appending a string to string array
-//only appends the string if it doesn't already exsist in the array
+// appendUnique is a function for appending a string to string array
+// only appends the string if it doesn't already exsist in the array
 func appendUnique(slice []string, id string) []string {
 	for _, s := range slice {
 		if s == id {
@@ -47,9 +51,9 @@ func appendUnique(slice []string, id string) []string {
 	return append(slice, id)
 }
 
-//removeItem removes a string from the array and returns the new array
-//first param is the array to remove from
-//second param is the string to remove from array (removes all instances)
+// removeItem removes a string from the array and returns the new array
+// first param is the array to remove from
+// second param is the string to remove from array (removes all instances)
 func removeItem(slice []string, item string) []string {
 	for i, value := range slice {
 		if value == item {

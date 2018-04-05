@@ -29,19 +29,25 @@ const LIMIT = 15 * 24 * time.Hour
 
 //Gets every anime in animeList db and returns it as AnimeList type
 func getAnimeList() (result animeList) {
+	defer panicRecovery()
+
 	err := DBanimeList.Find(nil).Sort("lastUpdate").All(&result)
 	if err != nil {
-		log.Println("MongoDB error: ", err)
+		panic(fmt.Sprintf("Error querying MongoDB in function: %s - %s", "getAnimeList", err))
 	}
+
 	return
 }
 
 //Get every anime this user.id is subscribed to
 func getAnimeListForUser(userID string) (result animeList) {
+	defer panicRecovery()
+
 	err := DBanimeList.Find(bson.M{"subs": userID}).All(&result)
 	if err != nil {
-		log.Println("MongoDB error: ", err)
+		panic(fmt.Sprintf("Error querying MongoDB in function: %s - %s", "getAnimeListForUser", err))
 	}
+
 	return
 }
 

@@ -42,7 +42,7 @@ func discordStart(c *discordConfig) {
 	var err error
 	discord, err = discordgo.New("Bot " + c.Token)
 	if err != nil {
-		log.Fatal("Error initializing discord in discordStart() function!\n", err)
+		log.Fatal("Error initializing discord connection!\n", err)
 	}
 
 	//Set behavior & assign handlers
