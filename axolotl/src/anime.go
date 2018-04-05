@@ -66,8 +66,7 @@ func maintainAnimeList() {
 			updated += a.GetHref() //TODO: Limit HS scraping to maximum 1 per maintanance, instead of 1 per empty href per maintanance
 		}
 		if now.Sub(a.LastUpdate) > LIMIT {
-			a.Remove()
-			hidden++
+			hidden += a.Hide()
 		}
 	}
 	log.Printf("AUTO-MAINTANANCE: animeList updated! (hidden: %d | updated: %d)\n",
@@ -85,16 +84,30 @@ func (a *anime) Insert() {
 	DBanimeList.Insert(a)
 }
 
-//Remove anime from db by Anime.Name or Anime.Id
-func (a anime) Remove() (success int) {
+// Hide changes database field 'show' for this anime to false
+func (a anime) Hide() (success int) {
+	defer panicRecovery()
+
 	success = 0
+
 	if a.Name != "" {
-		DBanimeList.Remove(bson.M{"name": a.Name})
+		err := DBanimeList.Update(bson.M{"name": a.Name}, bson.M{"show": false})
+
+		if err != nil {
+			panic(fmt.Sprintf("Error updating MongoDB document in anime method: %s - %s", "Hide", err))
+		}
+
 		success = 1
 	} else if a.ID != "" {
-		DBanimeList.Remove(bson.M{"id": a.ID})
+		err := DBanimeList.Update(bson.M{"id": a.ID}, bson.M{"show": false})
+
+		if err != nil {
+			panic(fmt.Sprintf("Error updating MongoDB document in anime method: %s - %s", "Hide", err))
+		}
+
 		success = 1
 	}
+
 	return
 }
 
