@@ -22,6 +22,7 @@ type discordCommandHandler func([]string, *discordgo.MessageCreate)
 type msgObject struct {
 	Message string
 	Channel string
+	Embed   *discordgo.MessageEmbed
 }
 
 var (
@@ -75,8 +76,13 @@ func discordMsgDispatcher(c <-chan msgObject) {
 	for msg := range c {
 		// Increment the number of messages this bot has responded to
 		botResponses++
+		var err error
 
-		_, err := discord.ChannelMessageSend(msg.Channel, msg.Message)
+		if msg.Embed != nil {
+			_, err = discord.ChannelMessageSendEmbed(msg.Channel, msg.Embed)
+		} else if msg.Message != "" {
+			_, err = discord.ChannelMessageSend(msg.Channel, msg.Message)
+		}
 		if err != nil {
 			botResponses--
 			log.Printf("\nError sending discord message on channel %s: %s - %s",

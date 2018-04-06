@@ -3,33 +3,37 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-// HELPMESSAGE string lists all discord chat commands for this bot
-// already formatted as a discord string
-const HELPMESSAGE string = "***LIST OF BOT COMMANDS***\n" +
-	"Fields in [] are optional\n" +
-	"Fields in <> are mandatory\n\n" +
-	"```" +
-	"!help [bot] (Lists all bot commands)\n" +
-	"!uptime [bot](Prints current bot uptime)\n" +
-	"!sub <id> (Subscribe to anime and get notified when a new episode is released)\n" +
-	"!unsub <id> (Unsubscribe from anime)\n" +
-	"!mysubs (List all the anime you are subscribed to)\n" +
-	"!info [bot] (Prints bot information)" +
-	"```\n" +
-	"Full anime list at https://axolotl.gazzy.online/ \n" +
-	"For issues and suggestions go to https://github.com/gagizagi/Axolotl-GO"
-
 // helpCommand responds to discord text command 'help'
 // will respond on discord channel c (same channel as the received message)
-// response text is the HELPMESSAGE constant (list of all bot commands)
+// response text is the a discord embed
 func helpCommand(args []string, m *discordgo.MessageCreate) {
+	desc := "Notifies you of any new anime releases as soon as they are available.\n"
+	desc += "Subscribe to any anime you want to receive @mentions for with the `sub ID` command.\n\n"
+	desc += "[List of commands](https://github.com/gagizagi/Axolotl-GO#bot-commands)\n"
+	desc += "[List of anime](https://axolotl.gazzy.online/)\n\n"
+
+	avatarURL := "https://camo.githubusercontent.com/c40a9a73cc03b760a567df127d7fcebb59724580/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f617661746172732f3138353137373835313739393031313332392f37306336653365396135373633626564396664663336353130653831323733612e6a7067"
+
+	embed := &discordgo.MessageEmbed{
+		Color:       0xB1F971,
+		Timestamp:   time.Now().Format(time.RFC3339),
+		Title:       "Axolotl anime bot",
+		Description: desc,
+		URL:         "https://github.com/gagizagi/Axolotl-GO",
+		Footer: &discordgo.MessageEmbedFooter{
+			IconURL: avatarURL,
+			Text:    "GazZy#5249",
+		},
+	}
+
 	msgChan <- msgObject{
 		Channel: m.ChannelID,
-		Message: HELPMESSAGE,
+		Embed:   embed,
 	}
 }
 

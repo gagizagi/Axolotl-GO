@@ -105,8 +105,6 @@ func panicRecovery() {
 func scrapeHS() *goquery.Document {
 	defer panicRecovery()
 
-	//NOTE: Cloudflare scraping not needed for now
-	//scrapper := "http://scraper-422.rhcloud.com/?href="
 	target := "http://horriblesubs.info/shows/"
 
 	doc, err := goquery.NewDocument( /*scrapper + */ target)

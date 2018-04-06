@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -94,11 +93,6 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// If bot needs to parse this message, parse it
 	// otherwise ignore it and get out of the function
 	if prefix == "!" {
-		// FIXME: dev only
-		fmt.Printf("\nCommand received:\nPrefix: %s\nCommand: %s\nargs: ",
-			prefix, command)
-		fmt.Print(args)
-
 		// Increment the number of messages this bot has parsed
 		botMessages++
 
