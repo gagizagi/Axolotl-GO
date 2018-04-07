@@ -33,6 +33,7 @@ func helpCommand(args []string, m *discordgo.MessageCreate) {
 
 	msgChan <- msgObject{
 		Channel: m.ChannelID,
+		Message: "HELP EMBED",
 		Embed:   embed,
 	}
 }
