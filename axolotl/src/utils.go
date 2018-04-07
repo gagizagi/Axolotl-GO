@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -24,7 +25,10 @@ func init() {
 }
 
 func getUptime() string {
-	return time.Now().Sub(botStartTime).String()
+	hours := time.Now().Sub(botStartTime).Hours()
+	result := strconv.FormatFloat(hours, 'f', 1, 64)
+
+	return result + " Hour(s)"
 }
 
 // getUniqueSubs

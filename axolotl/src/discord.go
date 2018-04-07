@@ -11,6 +11,7 @@ import (
 type discordConfig struct {
 	Boss          string
 	Name          string
+	AvatarURL     string
 	AnimeChannel  string
 	AnimeChannels []string
 	Guilds        []string
@@ -25,7 +26,6 @@ type discordCommandHandler func([]string, *discordgo.MessageCreate)
 // Channel is the channel to which the message is sent
 // Embed is the embed object to send (Replaces Message string if present)
 // Author is the user ID that triggered this message
-// TODO: Make Author the backup channel for sending the message when permission on Channel is denied (403 error)
 type msgObject struct {
 	Message string
 	Channel string

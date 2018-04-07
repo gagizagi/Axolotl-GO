@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,16 +18,14 @@ func helpCommand(args []string, m *discordgo.MessageCreate) {
 	desc += "[List of commands](https://github.com/gagizagi/Axolotl-GO#bot-commands)\n"
 	desc += "[List of anime](https://axolotl.gazzy.online/)\n\n"
 
-	avatarURL := "https://camo.githubusercontent.com/c40a9a73cc03b760a567df127d7fcebb59724580/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f617661746172732f3138353137373835313739393031313332392f37306336653365396135373633626564396664663336353130653831323733612e6a7067"
-
 	embed := &discordgo.MessageEmbed{
 		Color:       0xB1F971,
 		Timestamp:   time.Now().Format(time.RFC3339),
 		Title:       "Axolotl anime bot",
-		Description: desc,
 		URL:         "https://github.com/gagizagi/Axolotl-GO",
+		Description: desc,
 		Footer: &discordgo.MessageEmbedFooter{
-			IconURL: avatarURL,
+			IconURL: discordCfg.AvatarURL,
 			Text:    "GazZy#5249",
 		},
 	}
@@ -142,19 +141,52 @@ func setStatus(args []string, m *discordgo.MessageCreate) {
 // botInfo responds with the different bot statistics
 // response is sent on the same channel as the received message
 func botInfo(args []string, m *discordgo.MessageCreate) {
-	result := "```"
-	result += fmt.Sprintf("Name: %s\n", discordCfg.Name)
-	result += fmt.Sprintf("Uptime: %s\n", getUptime())
-	result += fmt.Sprintf("Guilds: %d\n", len(discordCfg.Guilds))
-	result += fmt.Sprintf("Anime channels: %d\n", len(discordCfg.AnimeChannels))
-	result += fmt.Sprintf("Unique subscribers: %d\n", getUniqueSubs())
-	result += fmt.Sprintf("Messages read: %d\n", botReads)
-	result += fmt.Sprintf("Messages parsed: %d\n", botMessages)
-	result += fmt.Sprintf("Message responses: %d\n", botResponses+1)
-	result += "```"
+	embed := &discordgo.MessageEmbed{
+		Color:     0xB1F971,
+		Timestamp: time.Now().Format(time.RFC3339),
+		Title:     "Axolotl anime bot",
+		URL:       "https://github.com/gagizagi/Axolotl-GO",
+		Fields: []*discordgo.MessageEmbedField{
+			&discordgo.MessageEmbedField{
+				Name:   "Uptime",
+				Value:  getUptime(),
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Guilds",
+				Value:  strconv.Itoa(len(discordCfg.Guilds)),
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Unique Subscribers",
+				Value:  strconv.Itoa(getUniqueSubs()),
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Messages Read",
+				Value:  strconv.Itoa(botReads),
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Messages Parsed",
+				Value:  strconv.Itoa(botMessages),
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Messages Sent",
+				Value:  strconv.Itoa(botResponses),
+				Inline: true,
+			},
+		},
+		Footer: &discordgo.MessageEmbedFooter{
+			IconURL: discordCfg.AvatarURL,
+			Text:    "GazZy#5249",
+		},
+	}
 
 	msgChan <- msgObject{
-		Message: result,
+		Message: "INFO EMBED",
+		Embed:   embed,
 		Channel: m.ChannelID,
 		Author:  m.Author.ID,
 	}
