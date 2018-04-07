@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -89,6 +90,21 @@ func discordMsgDispatcher(c <-chan msgObject) {
 			_, err = discord.ChannelMessageSendEmbed(msg.Channel, msg.Embed)
 		} else if msg.Message != "" {
 			_, err = discord.ChannelMessageSend(msg.Channel, msg.Message)
+		}
+		// Handle errors
+		if err != nil && strings.Contains(err.Error(), "Missing Permissions") {
+			// If bot is missing permissions to send text messages on this channel
+			// sends a private message to the author of the message
+			if msg.Author != "" {
+				ch, _ := discord.UserChannelCreate(msg.Author)
+				msg.Channel = ch.ID
+				msg.Message = "Unable to respond on that channel: Missing Permissions!\n"
+				msg.Message += "Try again on a different channel or here in private chat.\n"
+				msg.Message += "You can also ask a guild admin to give this bot permissions to post on that channel."
+				err = nil
+
+				_, err = discord.ChannelMessageSend(msg.Channel, msg.Message)
+			}
 		}
 		if err != nil {
 			botResponses--
