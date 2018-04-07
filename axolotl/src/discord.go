@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-//discordConfig is a struct containing user configuration for discord connection
+// discordConfig is a struct containing user configuration for discord connection
 type discordConfig struct {
 	Boss          string
 	Name          string
@@ -19,10 +19,17 @@ type discordConfig struct {
 
 type discordCommandHandler func([]string, *discordgo.MessageCreate)
 
+// msgObject contains the information for sending discord messages
+// Message is the message string to send (If embed is present serves as a short description of embed)
+// Channel is the channel to which the message is sent
+// Embed is the embed object to send (Replaces Message string if present)
+// Author is the user ID that triggered this message
+// TODO: Make Author the backup channel for sending the message when permission on Channel is denied (403 error)
 type msgObject struct {
 	Message string
 	Channel string
 	Embed   *discordgo.MessageEmbed
+	Author  string
 }
 
 var (

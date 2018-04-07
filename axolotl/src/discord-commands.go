@@ -35,6 +35,7 @@ func helpCommand(args []string, m *discordgo.MessageCreate) {
 		Channel: m.ChannelID,
 		Message: "HELP EMBED",
 		Embed:   embed,
+		Author:  m.Author.ID,
 	}
 }
 
@@ -54,11 +55,13 @@ func subCommand(args []string, m *discordgo.MessageCreate) {
 			msgChan <- msgObject{
 				Channel: m.ChannelID,
 				Message: "Successfully subscribed to " + newAnime.Name,
+				Author:  m.Author.ID,
 			}
 		} else {
 			msgChan <- msgObject{
 				Channel: m.ChannelID,
 				Message: "Invalid ID",
+				Author:  m.Author.ID,
 			}
 		}
 	}
@@ -80,11 +83,13 @@ func unsubCommand(args []string, m *discordgo.MessageCreate) {
 			msgChan <- msgObject{
 				Channel: m.ChannelID,
 				Message: "Successfully unsubscribed from " + newAnime.Name,
+				Author:  m.Author.ID,
 			}
 		} else {
 			msgChan <- msgObject{
 				Channel: m.ChannelID,
 				Message: "Invalid ID",
+				Author:  m.Author.ID,
 			}
 		}
 	}
@@ -107,6 +112,7 @@ func mySubs(args []string, m *discordgo.MessageCreate) {
 	msgChan <- msgObject{
 		Message: result,
 		Channel: m.ChannelID,
+		Author:  m.Author.ID,
 	}
 }
 
@@ -116,6 +122,7 @@ func uptime(args []string, m *discordgo.MessageCreate) {
 	msgChan <- msgObject{
 		Message: getUptime(),
 		Channel: m.ChannelID,
+		Author:  m.Author.ID,
 	}
 }
 
@@ -149,6 +156,7 @@ func botInfo(args []string, m *discordgo.MessageCreate) {
 	msgChan <- msgObject{
 		Message: result,
 		Channel: m.ChannelID,
+		Author:  m.Author.ID,
 	}
 }
 
@@ -173,6 +181,7 @@ func guilds(args []string, m *discordgo.MessageCreate) {
 			msgChan <- msgObject{
 				Message: result,
 				Channel: m.ChannelID,
+				Author:  m.Author.ID,
 			}
 			result = ""
 		}
@@ -182,6 +191,7 @@ func guilds(args []string, m *discordgo.MessageCreate) {
 		msgChan <- msgObject{
 			Message: result,
 			Channel: m.ChannelID,
+			Author:  m.Author.ID,
 		}
 	}
 }
