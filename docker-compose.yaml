@@ -2,7 +2,7 @@ version: "3"
 services:
   axolotl:
     build: ./axolotl
-    image: axolotl:21.3
+    image: axolotl:9.4
     container_name: axolotl
     depends_on:
       - mongo
@@ -18,8 +18,11 @@ services:
   
   nginx:
     build: ./nginx
-    image: my-nginx:21.3
+    image: my-nginx:9.4
     container_name: nginx
+    environment: 
+      - AMPLIFY_IMAGENAME=
+      - API_KEY=
     volumes:
       - ~/Axolotl/logs/nginx:/var/log/nginx
     depends_on:

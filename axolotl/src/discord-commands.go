@@ -119,7 +119,7 @@ func mySubs(args []string, m *discordgo.MessageCreate) {
 // response is sent on the same channel as the received message
 func uptime(args []string, m *discordgo.MessageCreate) {
 	msgChan <- msgObject{
-		Message: getUptime(),
+		Message: "Current bot uptime is " + getUptime(),
 		Channel: m.ChannelID,
 		Author:  m.Author.ID,
 	}
@@ -194,7 +194,6 @@ func botInfo(args []string, m *discordgo.MessageCreate) {
 
 // guilds responds with a list of all the guilds this bot is currently in
 // admin only command because it is potentially multiple messages long
-// TODO: test this command on production instance of the bot
 func guilds(args []string, m *discordgo.MessageCreate) {
 	// Only proceed if the message sender is discord admin
 	if m.Author.ID != discordCfg.Boss {
