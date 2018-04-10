@@ -30,11 +30,19 @@ func webServer() {
 	http.ListenAndServe(":80", nil)
 }
 
-// /anime path handler
+// / path handler
 func animeHandler(w http.ResponseWriter, r *http.Request) {
 	data := getAnimeList()
-	sort.Sort(data)
-	templateMap["aList"].Execute(w, data)
+	var shownData animeList
+
+	for _, a := range data {
+		if a.Show {
+			shownData = append(shownData, a)
+		}
+	}
+
+	sort.Sort(shownData)
+	templateMap["aList"].Execute(w, shownData)
 }
 
 // /static/* file server
