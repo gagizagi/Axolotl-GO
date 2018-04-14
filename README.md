@@ -41,7 +41,7 @@ mysubs|Lists all the anime you are subscribed to|`!mysubs`
 info|Returns information about the bot|`!info`
 prefix|Sets a new prefix for this bot on this server|`!prefix ?`|Server owner only
 notifyhere|Set this channel for anime notifications|`!notifyhere`|Server owner only
-mode|Set the notification mode of the bot|`!mode always`|Server owner only<br>`ignore` - Bot won't send any anime notifications<br>`subonly`(default) - Bot will only send notifications if someone from the server is subscribed to the anime<br>`always` - Bot will always send notifications, but won't mention anyone<br>`alwaysplus` - Bot will always send notifications and mention everyone subbed to the anime
+mode|Set the notification mode of the bot|`!mode always`|Server owner only<br><br>`ignore` - Bot won't send any anime notifications<br>`subonly`(default) - Bot will only send notifications if someone from the server is subscribed to the anime<br>`always` - Bot will always send notifications, but won't mention anyone<br>`alwaysplus` - Bot will always send notifications and mention everyone subbed to the anime
 status|Sets the game bot is "playing"|`!status minecraft`|Admin only
 guilds|Returns a list of all the guilds this bot is in|`!guilds`|Admin only
 
