@@ -7,74 +7,93 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-//discordReadyHandler sets required data after a successful connection
+// discordReadyHandler sets required data after a successful connection
 func discordReadyHandler(s *discordgo.Session, r *discordgo.Ready) {
-	//Sets this bots name in discordCfg.Name
+	// Sets this bots name in discordCfg.Name
 	discordCfg.Name = strings.ToUpper(r.User.Username)
 
-	//Iterates through guilds
+	// Iterate through guilds
 	for _, guild := range r.Guilds {
-		//Gets a list of channels for this guild
-		channels, _ := s.GuildChannels(guild.ID)
-		//Iterates through a list of channels for this guild
-		for _, channel := range channels {
-			//If it finds a channel with name 'anime'
-			//it will add it to discordCfg.AnimeChannels array
-			//which is used when sending new episode messages in discord
-			if channel.Name == discordCfg.AnimeChannel {
-				discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, channel.ID)
+		server := server{}
+		server.ID = guild.ID
+		server.fetch()
+
+		// TODO: remove eventually
+		// Attempt to get anime channel default for guilds that are missing it
+		// Temporary measure until all guilds migrate to the new model
+		if server.AnimeChannel == "" {
+			// Get a list of channels for this guild
+			channels, _ := s.GuildChannels(guild.ID)
+			// Iterate through channels for this guild
+			for _, channel := range channels {
+				// If it finds a channel with name 'anime' in its name
+				// it will update the db to use this channel until changed by guild admin
+				if channel.Name == "anime" {
+					server.updateAnimeChannel(channel.ID)
+				}
 			}
+		}
+
+		if server.GuildName == "" {
+			server.updateGuildName(guild.Name)
 		}
 	}
 
-	//Logs successful connection to discord was established
+	// Logs successful connection to discord was established
 	log.Println("Connected to discord as", discordCfg.Name)
 }
 
-//discordNewChannelHandler handles joining new channels
-func discordNewChannelHandler(s *discordgo.Session, c *discordgo.ChannelCreate) {
-	if c.Name == discordCfg.AnimeChannel {
-		discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, c.ID)
-	}
-}
-
-//discordLeaveChannelHandler handles leaving channels
+// discordLeaveChannelHandler handles leaving channels
 func discordLeaveChannelHandler(s *discordgo.Session, c *discordgo.ChannelDelete) {
-	if c.Name == discordCfg.AnimeChannel {
-		discordCfg.AnimeChannels = removeItem(discordCfg.AnimeChannels, c.ID)
+	guild, _ := s.Guild(c.GuildID)
+	server := server{}
+	server.ID = guild.ID
+	server.fetch()
+
+	if c.ID == server.AnimeChannel {
+		server.updateAnimeChannel("")
 	}
 }
 
-//discordChannelUpdateHandler handles channels being updated
-func discordChannelUpdateHandler(s *discordgo.Session, c *discordgo.ChannelUpdate) {
-	if c.Name == discordCfg.AnimeChannel {
-		discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, c.ID)
-	} else {
-		discordCfg.AnimeChannels = removeItem(discordCfg.AnimeChannels, c.ID)
-	}
-}
-
-//discordNewGuildHandler handlers joining a guild
-func discordNewGuildHandler(s *discordgo.Session, g *discordgo.GuildCreate) {
-	discordCfg.Guilds = appendUnique(discordCfg.Guilds, g.Name)
-
-	for _, c := range g.Channels {
-		if c.Name == discordCfg.AnimeChannel {
-			discordCfg.AnimeChannels = appendUnique(discordCfg.AnimeChannels, c.ID)
-		}
-	}
-}
-
-//discordLeaveGuildHandler handles leaving/being kicked from a guild
-//FIXME: remove this anime channel from config when kicked
+// discordLeaveGuildHandler handles leaving/being kicked from a guild
 func discordLeaveGuildHandler(s *discordgo.Session, g *discordgo.GuildDelete) {
-	discordCfg.Guilds = removeItem(discordCfg.Guilds, g.Name)
+	server := server{}
+	server.ID = g.ID
+	err := server.delete()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // discordMsgHandler is a handler function for incoming discord messages
 func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	defer panicRecovery()
+
 	// Increment the number of messages this bot has read
 	botReads++
+
+	// Ignore bots own messages
+	if m.Author.ID == discord.State.User.ID {
+		return
+	}
+
+	var server server
+
+	if !isPrivateMessage(m.Message) {
+		_, guild, err := getChannelGuildInfo(m.Message)
+		if err != nil {
+			panic(err)
+		}
+		server.ID = guild.ID
+		err = server.fetch()
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	if server.Prefix == "" {
+		server.Prefix = "!"
+	}
 
 	// Split received message into different parts (space seperated)
 	// prefix is the first char of the first part
@@ -85,14 +104,14 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var args []string
 	args = strings.Fields(m.Content)
 	if len(args) > 0 {
-		prefix = args[0][0:1]
-		command = args[0][1:]
+		prefix = args[0][0:len(server.Prefix)]
+		command = args[0][len(server.Prefix):]
 		args = strings.Fields(m.Content)[1:]
 	}
 
 	// If bot needs to parse this message, parse it
 	// otherwise ignore it and get out of the function
-	if prefix == "!" {
+	if prefix == server.Prefix {
 		// Increment the number of messages this bot has parsed
 		botMessages++
 

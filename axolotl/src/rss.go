@@ -78,33 +78,81 @@ func newUpdate(args []string) bool {
 		// If this series already exists in the database
 		// but needs to update the episode number
 		entry.UpdateEp()
+		if entry.Href == "" {
+			entry.Href = "http://horriblesubs.info"
+		}
 
-		if len(entry.Subs) > 0 {
-			newMessage := fmt.Sprintf(
-				"**New episode of %s released - Episode %d**\n",
-				entry.Name, entry.Episode)
+		// Discord message format for new episode release notification
+		messageBuilder := "**New episode of %s released - Episode %d**\n"
+		messageBuilder += "Download at %s\n"
+		messageBuilder += "To subscribe to this anime type `%ssub %s` - Users subscribed '%d'\n"
 
-			// Add mentions for every subbed user
-			for _, person := range entry.Subs {
-				newMessage += fmt.Sprintf("<@%s>", person)
+		// Range over all the guilds bot is in
+		gg := discord.State.Guilds
+		for _, g := range gg {
+			// Fetch this guilds settings from the db
+			guild := server{}
+			guild.ID = g.ID
+			guild.fetch()
+			if guild.Prefix == "" {
+				guild.Prefix = "!"
+			}
+			if guild.AnimeChannel == "" {
+				continue
 			}
 
-			// Add downloads link
-			if entry.Href != "" {
-				newMessage += fmt.Sprintf("\nDownload at %s\n", entry.Href)
-			} else {
-				newMessage += fmt.Sprint("\nDownload at http://horriblesubs.info/\n")
-			}
+			// Handle sending the message based on the guilds notification mode
+			switch guild.Mode {
+			// Won't send any notifications
+			case "ignore":
+				continue
 
-			// Add subscribe ID
-			newMessage += fmt.Sprintf(
-				"To subscribe to this anime type \"!sub %s\"",
-				entry.ID)
+			// Will always send notifications, but will never include mentions for subscribers
+			case "always":
+				msgChan <- msgObject{
+					Channel: guild.AnimeChannel,
+					Message: fmt.Sprintf(messageBuilder, entry.Name, entry.Episode, entry.Href, guild.Prefix, entry.ID, len(entry.Subs)),
+				}
 
-			// Send update message to all anime channels
-			// TODO: make a function
-			for _, channel := range discordCfg.AnimeChannels {
-				discord.ChannelMessageSend(channel, newMessage)
+			// Will always send notifications, and also include mentions for subscribers
+			case "alwaysplus":
+				messageBuilder += "Subscribers: %s"
+				mentions := ""
+
+				mm := g.Members
+				for _, m := range mm {
+					if contains(entry.Subs, m.User.ID) {
+						mentions += fmt.Sprintf("<@%s> ", m.User.ID)
+					}
+				}
+
+				msgChan <- msgObject{
+					Channel: guild.AnimeChannel,
+					Message: fmt.Sprintf(messageBuilder, entry.Name, entry.Episode, entry.Href, guild.Prefix, entry.ID, len(entry.Subs), mentions),
+				}
+
+			// subonly mode and default will send notifications only if someone on the server is subscribed to the anime
+			default:
+				if len(entry.Subs) > 0 {
+					relevantGuild := false
+					messageBuilder += "Subscribers: %s"
+					mentions := ""
+
+					mm := g.Members
+					for _, m := range mm {
+						if contains(entry.Subs, m.User.ID) {
+							mentions += fmt.Sprintf("<@%s> ", m.User.ID)
+							relevantGuild = true
+						}
+					}
+
+					if relevantGuild {
+						msgChan <- msgObject{
+							Channel: guild.AnimeChannel,
+							Message: fmt.Sprintf(messageBuilder, entry.Name, entry.Episode, entry.Href, guild.Prefix, entry.ID, len(entry.Subs), mentions),
+						}
+					}
+				}
 			}
 		}
 
@@ -114,15 +162,32 @@ func newUpdate(args []string) bool {
 		// Insert it into the database
 		entry.Insert()
 
-		// Announce new series to all anime channels
-		newMessage := fmt.Sprintf("**New series started: %s - Episode %d**\n",
-			entry.Name, entry.Episode)
-		newMessage += fmt.Sprintf("To subscribe to this anime type \"!sub %s\"",
-			entry.ID)
+		// Discord message format for new episode release notification
+		messageBuilder := "**New series started: %s - Episode %d**\n"
+		messageBuilder += "Download at http://horriblesubs.info\n"
+		messageBuilder += "To subscribe to this anime type `%ssub %s`\n"
 
-		// TODO: make a function
-		for _, channel := range discordCfg.AnimeChannels {
-			discord.ChannelMessageSend(channel, newMessage)
+		// Range over all the guilds bot is in
+		gg := discord.State.Guilds
+		for _, g := range gg {
+			// Fetch this guilds settings from the db
+			guild := server{}
+			guild.ID = g.ID
+			guild.fetch()
+			if guild.Prefix == "" {
+				guild.Prefix = "!"
+			}
+			if guild.AnimeChannel == "" {
+				continue
+			}
+			if guild.Mode == "ignore" {
+				continue
+			}
+
+			msgChan <- msgObject{
+				Channel: guild.AnimeChannel,
+				Message: fmt.Sprintf(messageBuilder, entry.Name, entry.Episode, guild.Prefix, entry.ID),
+			}
 		}
 
 		return true

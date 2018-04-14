@@ -1,12 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
 
 	"github.com/PuerkitoBio/goquery"
 	"gopkg.in/mgo.v2/bson"
@@ -117,4 +120,46 @@ func scrapeHS() *goquery.Document {
 	}
 
 	return doc
+}
+
+// getChannelGuildInfo fetches channel and guild object from message object
+// information is retrieved from discord.State if or from discord object as a fallback
+// https://github.com/bwmarrin/discordgo/wiki/FAQ#getting-the-guild-from-a-message
+func getChannelGuildInfo(m *discordgo.Message) (*discordgo.Channel, *discordgo.Guild, error) {
+	channel, err := discord.State.Channel(m.ChannelID)
+	if err != nil {
+		channel, err = discord.Channel(m.ChannelID)
+		if err != nil {
+			return nil, nil, errors.New("Error retrieving channel object from message: - " + err.Error())
+		}
+	}
+
+	guild, err := discord.State.Guild(channel.GuildID)
+	if err != nil {
+		guild, err = discord.Guild(channel.GuildID)
+		if err != nil {
+			return nil, nil, errors.New("Error retrieving guild object from message: - " + err.Error())
+		}
+	}
+
+	return channel, guild, nil
+}
+
+// isPrivateMessage Returns true if message received by the bot is from a private chat
+func isPrivateMessage(m *discordgo.Message) bool {
+	privChan, err := discord.UserChannelCreate(m.Author.ID)
+	if err == nil && privChan.ID == m.ChannelID {
+		return true
+	}
+	return false
+}
+
+// contains checks if a string array contains the matching string
+func contains(ss []string, match string) bool {
+	for _, s := range ss {
+		if s == match {
+			return true
+		}
+	}
+	return false
 }

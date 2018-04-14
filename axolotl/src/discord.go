@@ -9,14 +9,11 @@ import (
 
 // discordConfig is a struct containing user configuration for discord connection
 type discordConfig struct {
-	Boss          string
-	Name          string
-	AvatarURL     string
-	AnimeChannel  string
-	AnimeChannels []string
-	Guilds        []string
-	Token         string
-	Debug         bool
+	Boss      string
+	Name      string
+	AvatarURL string
+	Token     string
+	Debug     bool
 }
 
 type discordCommandHandler func([]string, *discordgo.MessageCreate)
@@ -58,11 +55,8 @@ func discordStart(c *discordConfig) {
 	discord.Debug = c.Debug
 	discord.AddHandler(discordMsgHandler)
 	discord.AddHandler(discordReadyHandler)
-	discord.AddHandler(discordNewGuildHandler)
 	discord.AddHandler(discordLeaveGuildHandler)
-	discord.AddHandler(discordNewChannelHandler)
 	discord.AddHandler(discordLeaveChannelHandler)
-	discord.AddHandler(discordChannelUpdateHandler)
 	discord.Open() //Opens discord connection
 
 	commandList = make(map[string]discordCommandHandler)
@@ -74,6 +68,9 @@ func discordStart(c *discordConfig) {
 	commandList["STATUS"] = setStatus
 	commandList["INFO"] = botInfo
 	commandList["GUILDS"] = guilds
+	commandList["NOTIFYHERE"] = updateAnimeChannelCommand
+	commandList["PREFIX"] = updatePrefixCommand
+	//FIXME: add 'mode' command
 
 	go discordMsgDispatcher(msgChan)
 }
@@ -91,21 +88,22 @@ func discordMsgDispatcher(c <-chan msgObject) {
 		} else if msg.Message != "" {
 			_, err = discord.ChannelMessageSend(msg.Channel, msg.Message)
 		}
+
 		// Handle errors
 		if err != nil && strings.Contains(err.Error(), "Missing Permissions") {
 			// If bot is missing permissions to send text messages on this channel
-			// sends a private message to the author of the message
+			// sends a private message to the author of the message instead
 			if msg.Author != "" {
-				ch, _ := discord.UserChannelCreate(msg.Author)
-				msg.Channel = ch.ID
-				msg.Message = "Unable to respond on that channel: Missing Permissions!\n"
-				msg.Message += "Try again on a different channel or here in private chat.\n"
-				msg.Message += "You can also ask a guild admin to give this bot permissions to post on that channel."
-				err = nil
-
-				_, err = discord.ChannelMessageSend(msg.Channel, msg.Message)
+				privCh, _ := discord.UserChannelCreate(msg.Author)
+				if msg.Embed != nil {
+					_, err = discord.ChannelMessageSendEmbed(privCh.ID, msg.Embed)
+				} else if msg.Message != "" {
+					_, err = discord.ChannelMessageSend(privCh.ID, msg.Message)
+				}
+				msg.Message = "FALLBACK PRIVATE MESSAGE" // Set error message in case it failed
 			}
 		}
+
 		if err != nil {
 			botResponses--
 			log.Printf("Error sending discord message on channel %s: %s - %s",

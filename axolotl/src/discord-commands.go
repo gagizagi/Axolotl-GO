@@ -43,8 +43,6 @@ func helpCommand(args []string, m *discordgo.MessageCreate) {
 // will subscribe the user if the anime exists and return a message
 // will return an error message to the user if the anime does not exist
 // response is sent on the same channel as the received message
-// TODO: add responses when format of the command is wrong
-// TODO: make it possible to sub to an array of ids with one command
 // or user is already a sub
 func subCommand(args []string, m *discordgo.MessageCreate) {
 	if len(args) > 0 {
@@ -71,8 +69,6 @@ func subCommand(args []string, m *discordgo.MessageCreate) {
 // will unsubscribe the user if the anime exists and return a message
 // will return an error message to the user if the anime does not exist
 // response is sent on the same channel as the received message
-// TODO: add responses when format of the command is wrong
-// TODO: make it possible to unsub from an array of ids with one command
 // or user is not a sub
 func unsubCommand(args []string, m *discordgo.MessageCreate) {
 	if len(args) > 0 {
@@ -154,7 +150,7 @@ func botInfo(args []string, m *discordgo.MessageCreate) {
 			},
 			&discordgo.MessageEmbedField{
 				Name:   "Guilds",
-				Value:  strconv.Itoa(len(discordCfg.Guilds)),
+				Value:  strconv.Itoa(len(discord.State.Guilds)),
 				Inline: true,
 			},
 			&discordgo.MessageEmbedField{
@@ -201,13 +197,13 @@ func guilds(args []string, m *discordgo.MessageCreate) {
 	}
 
 	result := fmt.Sprintf("Bot is currently in %d guilds: ",
-		len(discordCfg.Guilds))
+		len(discord.State.Guilds))
 
-	for i, guild := range discordCfg.Guilds {
+	for i, guild := range discord.State.Guilds {
 		if i == 0 {
-			result += " " + guild
-		} else if (len(result) + len(guild) + 2) <= 2000 {
-			result += ", " + guild
+			result += " " + guild.Name
+		} else if (len(result) + len(guild.Name) + 2) <= 2000 {
+			result += ", " + guild.Name
 		} else {
 			msgChan <- msgObject{
 				Message: result,
@@ -224,5 +220,91 @@ func guilds(args []string, m *discordgo.MessageCreate) {
 			Channel: m.ChannelID,
 			Author:  m.Author.ID,
 		}
+	}
+}
+
+// updateAnimeChannel will bind anime notifications to this channel for this server
+// only works if called by the admin of the server
+func updateAnimeChannelCommand(args []string, m *discordgo.MessageCreate) {
+	defer panicRecovery()
+
+	// Stop execution if it is in a private message
+	if isPrivateMessage(m.Message) {
+		return
+	}
+
+	_, guild, err := getChannelGuildInfo(m.Message)
+	if err != nil {
+		panic(err)
+	}
+
+	// Stop execution if the user is not server owner
+	if guild.OwnerID != m.Author.ID {
+		return
+	}
+
+	// Make a server object and update its channel field
+	s := server{
+		ID: guild.ID,
+	}
+	err = s.updateAnimeChannel(m.ChannelID)
+	if err != nil {
+		panic("Error updating new anime channel in database: - " + err.Error())
+	}
+
+	// Send success message back to user
+	msgChan <- msgObject{
+		Message: "Changed anime updates to this channel",
+		Channel: m.ChannelID,
+		Author:  m.Author.ID,
+	}
+}
+
+// updatePrefixCommand changes this bots prefix for this server
+// only works if called by the admin of the server
+func updatePrefixCommand(args []string, m *discordgo.MessageCreate) {
+	defer panicRecovery()
+
+	// Stop execution if it is in a private message
+	if isPrivateMessage(m.Message) {
+		return
+	}
+
+	_, guild, err := getChannelGuildInfo(m.Message)
+	if err != nil {
+		panic(err)
+	}
+
+	// Stop execution if the user is not server owner
+	if guild.OwnerID != m.Author.ID {
+		return
+	}
+
+	// Make a server object and update its prefix field
+	s := server{
+		ID: guild.ID,
+	}
+	var newPrefix string
+	if len(args) > 0 {
+		newPrefix = args[0]
+		err = s.updatePrefix(newPrefix)
+	} else {
+		msgChan <- msgObject{
+			Message: "Please provide the new prefix for this server. Example `!prefix ?`",
+			Channel: m.ChannelID,
+			Author:  m.Author.ID,
+		}
+		return
+	}
+
+	if err != nil {
+		panic("Error updating new anime channel in database: - " + err.Error())
+	}
+
+	// Send success message back to user
+	msgChan <- msgObject{
+		Message: fmt.Sprintf("Changed bot prefix for this guild to `%s`", newPrefix),
+		Channel: m.ChannelID,
+		Author:  m.Author.ID,
 	}
 }

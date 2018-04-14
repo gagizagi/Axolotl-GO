@@ -6,11 +6,10 @@ import (
 )
 
 var discordClient = discordConfig{
-	Boss:         os.Getenv("DISCORD_BOSS"),
-	Token:        os.Getenv("DISCORD_TOKEN"),
-	AvatarURL:    "https://axolotl.gazzy.online/static/axolotl.jpg",
-	AnimeChannel: "anime",
-	Debug:        false,
+	Boss:      os.Getenv("DISCORD_BOSS"),
+	Token:     os.Getenv("DISCORD_TOKEN"),
+	AvatarURL: "https://axolotl.gazzy.online/static/axolotl.jpg",
+	Debug:     false,
 }
 
 func init() {
