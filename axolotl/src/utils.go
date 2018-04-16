@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -157,7 +158,7 @@ func isPrivateMessage(m *discordgo.Message) bool {
 // contains checks if a string array contains the matching string
 func contains(ss []string, match string) bool {
 	for _, s := range ss {
-		if s == match {
+		if strings.ToUpper(s) == strings.ToUpper(match) {
 			return true
 		}
 	}

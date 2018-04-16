@@ -22,8 +22,6 @@ type server struct {
 // updates the calling server with the updated server returned from the db
 // Returns an error if there was one
 func (s *server) updateAnimeChannel(newChannelID string) error {
-	defer panicRecovery()
-
 	updateQuery := bson.M{
 		"$set": bson.M{
 			"id":       s.ID,
@@ -52,8 +50,6 @@ func (s *server) updateAnimeChannel(newChannelID string) error {
 // updates the calling server with the updated server returned from the db
 // Returns an error if there was one
 func (s *server) updateGuildName(guildName string) error {
-	defer panicRecovery()
-
 	updateQuery := bson.M{
 		"$set": bson.M{
 			"id":    s.ID,
@@ -82,12 +78,33 @@ func (s *server) updateGuildName(guildName string) error {
 // updates the calling server with the updated server object returned from the db
 // Returns an error if there was one
 func (s *server) updatePrefix(prefix string) error {
-	defer panicRecovery()
-
 	updateQuery := bson.M{
 		"$set": bson.M{
 			"id":     s.ID,
 			"prefix": prefix,
+		},
+	}
+
+	change := mgo.Change{
+		Update:    updateQuery,
+		Upsert:    true,
+		Remove:    false,
+		ReturnNew: true,
+	}
+
+	_, err := DBserverList.Find(bson.M{"id": s.ID}).Apply(change, s)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *server) updateGuildMode(newMode string) error {
+	updateQuery := bson.M{
+		"$set": bson.M{
+			"id":   s.ID,
+			"mode": newMode,
 		},
 	}
 
@@ -121,5 +138,10 @@ func (s *server) fetch() error {
 	if err != nil {
 		return errors.New("Error trying to database find: - " + err.Error())
 	}
+
+	if s.Prefix == "" {
+		s.Prefix = "!"
+	}
+
 	return nil
 }

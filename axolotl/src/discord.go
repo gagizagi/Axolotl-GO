@@ -70,7 +70,7 @@ func discordStart(c *discordConfig) {
 	commandList["GUILDS"] = guilds
 	commandList["NOTIFYHERE"] = updateAnimeChannelCommand
 	commandList["PREFIX"] = updatePrefixCommand
-	//FIXME: add 'mode' command
+	commandList["MODE"] = updateModeCommand
 
 	go discordMsgDispatcher(msgChan)
 }

@@ -91,10 +91,6 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	if server.Prefix == "" {
-		server.Prefix = "!"
-	}
-
 	// Split received message into different parts (space seperated)
 	// prefix is the first char of the first part
 	// command is the rest of first part (not including first char)

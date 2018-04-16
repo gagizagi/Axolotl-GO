@@ -94,9 +94,7 @@ func newUpdate(args []string) bool {
 			guild := server{}
 			guild.ID = g.ID
 			guild.fetch()
-			if guild.Prefix == "" {
-				guild.Prefix = "!"
-			}
+
 			if guild.AnimeChannel == "" {
 				continue
 			}
@@ -174,9 +172,7 @@ func newUpdate(args []string) bool {
 			guild := server{}
 			guild.ID = g.ID
 			guild.fetch()
-			if guild.Prefix == "" {
-				guild.Prefix = "!"
-			}
+
 			if guild.AnimeChannel == "" {
 				continue
 			}

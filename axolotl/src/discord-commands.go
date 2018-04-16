@@ -17,6 +17,7 @@ func helpCommand(args []string, m *discordgo.MessageCreate) {
 	desc += "Subscribe to any anime you want to receive @mentions for with the `sub ID` command.\n\n"
 	desc += "[List of commands](https://github.com/gagizagi/Axolotl-GO#bot-commands)\n"
 	desc += "[List of anime](https://axolotl.gazzy.online/)\n\n"
+	desc += "[Bugs and suggestions](https://github.com/gagizagi/Axolotl-GO/issues)"
 
 	embed := &discordgo.MessageEmbed{
 		Color:       0xB1F971,
@@ -284,13 +285,18 @@ func updatePrefixCommand(args []string, m *discordgo.MessageCreate) {
 	s := server{
 		ID: guild.ID,
 	}
+	err = s.fetch()
+	if err != nil {
+		panic(err)
+	}
+
 	var newPrefix string
 	if len(args) > 0 {
 		newPrefix = args[0]
 		err = s.updatePrefix(newPrefix)
 	} else {
 		msgChan <- msgObject{
-			Message: "Please provide the new prefix for this server. Example `!prefix ?`",
+			Message: fmt.Sprintf("Please provide the new prefix for this server. Example `%sprefix ?`", s.Prefix),
 			Channel: m.ChannelID,
 			Author:  m.Author.ID,
 		}
@@ -298,12 +304,88 @@ func updatePrefixCommand(args []string, m *discordgo.MessageCreate) {
 	}
 
 	if err != nil {
-		panic("Error updating new anime channel in database: - " + err.Error())
+		panic("Error updating new server prefix in database: - " + err.Error())
 	}
 
 	// Send success message back to user
 	msgChan <- msgObject{
 		Message: fmt.Sprintf("Changed bot prefix for this guild to `%s`", newPrefix),
+		Channel: m.ChannelID,
+		Author:  m.Author.ID,
+	}
+}
+
+func updateModeCommand(args []string, m *discordgo.MessageCreate) {
+	defer panicRecovery()
+
+	// Stop execution if it is in a private message
+	if isPrivateMessage(m.Message) {
+		return
+	}
+
+	_, guild, err := getChannelGuildInfo(m.Message)
+	if err != nil {
+		panic(err)
+	}
+
+	// Stop execution if the user is not server owner
+	if guild.OwnerID != m.Author.ID {
+		return
+	}
+
+	// Make a server object and update its prefix field
+	s := server{
+		ID: guild.ID,
+	}
+	err = s.fetch()
+	if err != nil {
+		panic(err)
+	}
+
+	// Check if new mode was supplied with the command
+	if len(args) < 1 {
+		msgChan <- msgObject{
+			Message: fmt.Sprintf("Please specify the new notification mode for this server. Example `%smode always`", s.Prefix),
+			Channel: m.ChannelID,
+			Author:  m.Author.ID,
+		}
+		return
+	}
+
+	newMode := args[0]
+	validModes := []string{"subonly", "always", "alwaysplus", "ignore"}
+
+	// Check if the supplied mode is a valid notification mode
+	if !contains(validModes, newMode) {
+		messageBuilder := fmt.Sprintf("Invalid mode `%s`.\n\n Valid modes are:\n", newMode)
+		for i, mode := range validModes {
+			messageBuilder += "\n"
+			if strings.ToUpper(mode) == strings.ToUpper(s.Mode) {
+				messageBuilder += fmt.Sprintf("`%s (current mode)` ", mode)
+			} else if i == 0 {
+				messageBuilder += fmt.Sprintf("`%s (default mode)` ", mode)
+			} else {
+				messageBuilder += fmt.Sprintf("`%s` ", mode)
+			}
+		}
+
+		msgChan <- msgObject{
+			Message: messageBuilder,
+			Channel: m.ChannelID,
+			Author:  m.Author.ID,
+		}
+		return
+	}
+
+	// Update notification mode
+	err = s.updateGuildMode(newMode)
+	if err != nil {
+		panic("Error updating guild notification mode in database: - " + err.Error())
+	}
+
+	// Send success message back to user
+	msgChan <- msgObject{
+		Message: fmt.Sprintf("Changed notification mode for this guild to `%s`", newMode),
 		Channel: m.ChannelID,
 		Author:  m.Author.ID,
 	}
