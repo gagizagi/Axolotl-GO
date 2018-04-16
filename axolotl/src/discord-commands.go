@@ -152,7 +152,7 @@ func botInfo(args []string, m *discordgo.MessageCreate) {
 		panic(err)
 	}
 
-	notifyChannel := ""
+	notifyChannel := "Not set"
 	for _, channel := range guild.Channels {
 		if channel.ID == server.AnimeChannel {
 			notifyChannel = channel.Name
