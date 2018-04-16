@@ -138,6 +138,27 @@ func setStatus(args []string, m *discordgo.MessageCreate) {
 // botInfo responds with the different bot statistics
 // response is sent on the same channel as the received message
 func botInfo(args []string, m *discordgo.MessageCreate) {
+	defer panicRecovery()
+
+	_, guild, err := getChannelGuildInfo(m.Message)
+	if err != nil {
+		panic(err)
+	}
+	server := server{
+		ID: guild.ID,
+	}
+	err = server.fetch()
+	if err != nil {
+		panic(err)
+	}
+
+	notifyChannel := ""
+	for _, channel := range guild.Channels {
+		if channel.ID == server.AnimeChannel {
+			notifyChannel = channel.Name
+		}
+	}
+
 	embed := &discordgo.MessageEmbed{
 		Color:     0xB1F971,
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -172,6 +193,21 @@ func botInfo(args []string, m *discordgo.MessageCreate) {
 			&discordgo.MessageEmbedField{
 				Name:   "Messages Sent",
 				Value:  strconv.Itoa(botResponses),
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Prefix",
+				Value:  server.Prefix,
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Mode",
+				Value:  server.Mode,
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Notify channel",
+				Value:  notifyChannel,
 				Inline: true,
 			},
 		},

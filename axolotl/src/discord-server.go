@@ -143,5 +143,9 @@ func (s *server) fetch() error {
 		s.Prefix = "!"
 	}
 
+	if s.Mode == "" {
+		s.Mode = "subonly"
+	}
+
 	return nil
 }
