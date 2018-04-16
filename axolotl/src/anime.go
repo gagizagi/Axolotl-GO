@@ -57,7 +57,6 @@ func getAnimeListForUser(userID string) (result animeList) {
 // maintainAnimeList db maintanance function
 // changes the 'show' database field of all entries over LIMIT days old to false
 // tries to update the 'href' database field for entries that don't have one yet
-// TODO: Potentially merge this with rssReader
 func maintainAnimeList() {
 	// Number of hidden and/or updated entries
 	hidden, updated := 0, 0
@@ -69,7 +68,7 @@ func maintainAnimeList() {
 		if len(a.Href) < 5 && doc != nil {
 			updated += a.GetHref(doc)
 		}
-		if now.Sub(a.LastUpdate) > LIMIT {
+		if now.Sub(a.LastUpdate) > LIMIT && a.Show {
 			hidden += a.Hide()
 		}
 	}
