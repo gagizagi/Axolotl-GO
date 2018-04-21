@@ -85,7 +85,7 @@ func newUpdate(args []string) bool {
 		// Discord message format for new episode release notification
 		messageBuilder := "**New episode of %s released - Episode %d**\n"
 		messageBuilder += "Download at %s\n"
-		messageBuilder += "To subscribe to this anime type `%ssub %s` - Total users subscribed `%`\n"
+		messageBuilder += "To subscribe to this anime type `%ssub %s` - Total users subscribed `%d`\n"
 
 		// Range over all the guilds bot is in
 		gg := discord.State.Guilds
