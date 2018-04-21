@@ -8,7 +8,7 @@ import (
 var discordClient = discordConfig{
 	Boss:      os.Getenv("DISCORD_BOSS"),
 	Token:     os.Getenv("DISCORD_TOKEN"),
-	AvatarURL: "https://axolotl.gazzy.online/static/axolotl.jpg",
+	AvatarURL: "https://axolotl.gazzy.online/static/axolotlava.jpg",
 	Debug:     false,
 }
 
