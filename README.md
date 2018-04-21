@@ -4,9 +4,6 @@
 
 ### Introduction
 
-Update 14.4.2018: Almost done with the big update. All that's needed now is some testing and more polish. Hopefully live 
-within the next week.
-
 Discord and IRC bot focused primarily on providing current season airing anime episode updates as discord @mentions.
 Bot has 99.9% uptime and is currently in daily use on over 200 servers.
 
