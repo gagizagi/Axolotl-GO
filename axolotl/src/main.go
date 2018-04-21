@@ -20,7 +20,7 @@ func main() {
 	defer webServer()
 	dbConn()
 
-	go tickerHelper(10*time.Minute, rssReader, true)
 	go discordStart(&discordClient)
+	go tickerHelper(10*time.Minute, rssReader, false)
 	go tickerHelper(10*time.Hour, maintainAnimeList, true)
 }

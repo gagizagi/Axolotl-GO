@@ -114,7 +114,7 @@ func newUpdate(args []string) bool {
 
 			// Will always send notifications, and also include mentions for subscribers
 			case "alwaysplus":
-				messageBuilder += "Subscribers: %s"
+				messageBuilderPlus := messageBuilder + "Subscribers: %s"
 				mentions := ""
 
 				mm := g.Members
@@ -126,14 +126,14 @@ func newUpdate(args []string) bool {
 
 				msgChan <- msgObject{
 					Channel: guild.AnimeChannel,
-					Message: fmt.Sprintf(messageBuilder, entry.Name, entry.Episode, entry.Href, guild.Prefix, entry.ID, len(entry.Subs), mentions),
+					Message: fmt.Sprintf(messageBuilderPlus, entry.Name, entry.Episode, entry.Href, guild.Prefix, entry.ID, len(entry.Subs), mentions),
 				}
 
 			// subonly mode and default will send notifications only if someone on the server is subscribed to the anime
 			default:
 				if len(entry.Subs) > 0 {
 					relevantGuild := false
-					messageBuilder += "Subscribers: %s"
+					messageBuilderPlus := messageBuilder + "Subscribers: %s"
 					mentions := ""
 
 					mm := g.Members
@@ -147,7 +147,7 @@ func newUpdate(args []string) bool {
 					if relevantGuild {
 						msgChan <- msgObject{
 							Channel: guild.AnimeChannel,
-							Message: fmt.Sprintf(messageBuilder, entry.Name, entry.Episode, entry.Href, guild.Prefix, entry.ID, len(entry.Subs), mentions),
+							Message: fmt.Sprintf(messageBuilderPlus, entry.Name, entry.Episode, entry.Href, guild.Prefix, entry.ID, len(entry.Subs), mentions),
 						}
 					}
 				}
