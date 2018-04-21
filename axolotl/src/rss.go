@@ -85,7 +85,7 @@ func newUpdate(args []string) bool {
 		// Discord message format for new episode release notification
 		messageBuilder := "**New episode of %s released - Episode %d**\n"
 		messageBuilder += "Download at %s\n"
-		messageBuilder += "To subscribe to this anime type `%ssub %s` - Users subscribed '%d'\n"
+		messageBuilder += "To subscribe to this anime type `%ssub %s` - Total users subscribed `%`\n"
 
 		// Range over all the guilds bot is in
 		gg := discord.State.Guilds
@@ -114,7 +114,7 @@ func newUpdate(args []string) bool {
 
 			// Will always send notifications, and also include mentions for subscribers
 			case "alwaysplus":
-				messageBuilderPlus := messageBuilder + "Subscribers: %s"
+				messageBuilderPlus := messageBuilder + "Subscribers in this guild: %s"
 				mentions := ""
 
 				mm := g.Members
@@ -133,7 +133,7 @@ func newUpdate(args []string) bool {
 			default:
 				if len(entry.Subs) > 0 {
 					relevantGuild := false
-					messageBuilderPlus := messageBuilder + "Subscribers: %s"
+					messageBuilderPlus := messageBuilder + "Subscribers in this guild: %s"
 					mentions := ""
 
 					mm := g.Members

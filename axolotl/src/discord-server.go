@@ -1,8 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"strings"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -14,6 +14,20 @@ type server struct {
 	AnimeChannel string `bson:"aChannel"`
 	Mode         string `bson:"mode"`
 	GuildName    string `bson:"gName"`
+}
+
+// Insert inserts a new server entry to db
+func (s *server) Insert() error {
+	if s.ID == "" {
+		return fmt.Errorf("Error trying to insert server into database: %s - Missing ID", *s)
+	}
+
+	err := DBserverList.Insert(s)
+	if err != nil {
+		return fmt.Errorf("Error trying to insert server into database: %s - %s", *s, err)
+	}
+
+	return nil
 }
 
 // updateAnimeChannel will update this servers aChannel field in the database
@@ -136,7 +150,11 @@ func (s *server) delete() error {
 func (s *server) fetch() error {
 	err := DBserverList.Find(bson.M{"id": s.ID}).One(s)
 	if err != nil {
-		return errors.New("Error trying to database find: - " + err.Error())
+		if strings.Contains(err.Error(), "not found") {
+			s.Insert()
+		} else {
+			return fmt.Errorf("Error trying to database find: %s - %s", *s, err.Error())
+		}
 	}
 
 	if s.Prefix == "" {
