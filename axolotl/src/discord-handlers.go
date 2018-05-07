@@ -100,8 +100,11 @@ func discordMsgHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var args []string
 	args = strings.Fields(m.Content)
 	if len(args) > 0 {
-		prefix = args[0][0:len(server.Prefix)]
-		command = args[0][len(server.Prefix):]
+		if len(args[0]) > len(server.Prefix) {
+			// Make sure there are no index out of bounds runtime errors
+			prefix = args[0][0:len(server.Prefix)]
+			command = args[0][len(server.Prefix):]
+		}
 		args = strings.Fields(m.Content)[1:]
 	}
 
