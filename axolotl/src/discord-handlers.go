@@ -57,10 +57,14 @@ func discordLeaveChannelHandler(s *discordgo.Session, c *discordgo.ChannelDelete
 
 // discordLeaveGuildHandler handles leaving/being kicked from a guild
 func discordLeaveGuildHandler(s *discordgo.Session, g *discordgo.GuildDelete) {
-	server := server{}
-	server.ID = g.ID
-	err := server.delete()
-	if err != nil {
+	// If guild is unavailable due to a server outage do nothing
+	if g.Unavailable {
+		return
+	}
+
+	// If the bot got removed from the guild remove guild from database
+	server := server{ID: g.ID}
+	if err := server.delete(); err != nil {
 		log.Println(err)
 	}
 }
