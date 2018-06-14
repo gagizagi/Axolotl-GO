@@ -18,13 +18,12 @@ services:
   
   nginx:
     build: ./nginx
-    image: my-nginx:9.4
+    image: my-nginx:14.6
     container_name: nginx
-    environment: 
-      - AMPLIFY_IMAGENAME=
-      - API_KEY=
+    env_file: ./nginx/.env
     volumes:
       - ~/Axolotl/logs/nginx:/var/log/nginx
+      - ~/Axolotl/.certs/:/etc/nginx/certs
     depends_on:
       - axolotl
     ports:
