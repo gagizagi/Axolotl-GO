@@ -105,7 +105,7 @@ func mySubs(args []string, m *discordgo.MessageCreate) {
 	}
 
 	result := fmt.Sprintf("<@%s> is subscribed to %d series: %s",
-		m.Author.ID, len(animeArray), strings.Join(subs, ", "))
+		m.Author.ID, len(subs), strings.Join(subs, ", "))
 
 	msgChan <- msgObject{
 		Message: result,
