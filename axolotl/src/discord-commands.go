@@ -99,7 +99,9 @@ func mySubs(args []string, m *discordgo.MessageCreate) {
 	animeArray := getAnimeListForUser(m.Author.ID)
 
 	for _, a := range animeArray {
-		subs = append(subs, fmt.Sprintf("%s(%s)", a.Name, a.ID))
+		if a.Show {
+			subs = append(subs, fmt.Sprintf("%s(%s)", a.Name, a.ID))
+		}
 	}
 
 	result := fmt.Sprintf("<@%s> is subscribed to %d series: %s",
