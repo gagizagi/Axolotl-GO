@@ -191,11 +191,11 @@ func (a *anime) GenID() {
 func (a *anime) GetHref(doc *goquery.Document) (success int) {
 	success = 0
 
-	doc.Find(".ind-show.linkful").Each(func(i int, s *goquery.Selection) {
+	doc.Find(".ind-show").Each(func(i int, s *goquery.Selection) {
 		name, _ := s.Find("a").Attr("title")
 		url, _ := s.Find("a").Attr("href")
 		if strings.ToLower(name) == strings.ToLower(a.Name) {
-			newHref := fmt.Sprintf("http://horriblesubs.info%s", url)
+			newHref := fmt.Sprintf("https://horriblesubs.info%s", url)
 			updateQuery := bson.M{
 				"$set": bson.M{
 					"href":       newHref,

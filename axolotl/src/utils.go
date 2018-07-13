@@ -113,7 +113,7 @@ func panicRecovery() {
 func scrapeHS() *goquery.Document {
 	defer panicRecovery()
 
-	target := "http://horriblesubs.info/shows/"
+	target := "https://horriblesubs.info/shows/"
 
 	doc, err := goquery.NewDocument( /*scrapper + */ target)
 	if err != nil {
