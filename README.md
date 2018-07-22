@@ -1,6 +1,6 @@
 # Axolotl-GO
 
-![alt text](https://cdn.discordapp.com/avatars/185177851799011329/70c6e3e9a5763bed9fdf36510e81273a.jpg "Axolotl so moe")
+![alt text](https://cdn.discordapp.com/avatars/185177851799011329/85e5f93a566888a3151192749cd78746.jpg "Axolotl so moe")
 
 ### Introduction
 
@@ -20,9 +20,9 @@ Bot has 99.9% uptime and is currently in daily use on over 200 servers.
 ### Usage
 
 ###### Adding the bot to your guild:
-* Authorize it to join your guild [here](https://discordapp.com/oauth2/authorize?client_id=185177389163085824&scope=bot&permissions=19456) NOTE: You need to have sufficient permissions in guild and be logged in to authorize the bot.
+* Authorize it to join your guild [here](https://discordapp.com/oauth2/authorize?client_id=185177389163085824&scope=bot&permissions=19456)<br/>*NOTE: You need to have sufficient permissions in guild and be logged in to authorize the bot.*
 * Use the `!notifyhere` command in the channel you want to use for anime updates.
-* Optionally change the prefix for bot commands from '!' to anything you want with the `!prefix newPrefix` command.
+* Optionally change the prefix for bot commands from `!` to anything you want with the `!prefix newPrefix` command.
 * Optionally change the notification mode of the bot with the `!mode` command. [Read more under commands](#bot-commands)
 * Feel free to [contact me](#contact) if you have any issues getting the above to work, if you have any cool suggestion or found any bugs.
 
@@ -38,7 +38,7 @@ mysubs|Lists all the anime you are subscribed to|`!mysubs`
 info|Returns information about the bot|`!info`
 prefix|Sets a new prefix for this bot on this server|`!prefix ?`|Server owner only
 notifyhere|Set this channel for anime notifications|`!notifyhere`|Server owner only
-mode|Set the notification mode of the bot|`!mode always`|Server owner only<br><br>`ignore` - Bot won't send any anime notifications<br>`subonly`(default) - Bot will only send notifications if someone from the server is subscribed to the anime<br>`always` - Bot will always send notifications, but won't mention anyone<br>`alwaysplus` - Bot will always send notifications and mention everyone subbed to the anime
+mode|Set the notification mode of the bot|`!mode always`|Server owner only<br><br>`ignore` - Bot won't send any anime notifications<br>`subonly` (default) - Bot will only send notifications if someone from the server is subscribed to the anime<br>`always` - Bot will always send notifications, but won't mention anyone<br>`alwaysplus` - Bot will always send notifications and mention everyone subbed to the anime
 status|Sets the game bot is "playing"|`!status minecraft`|Admin only
 guilds|Returns a list of all the guilds this bot is in|`!guilds`|Admin only
 
