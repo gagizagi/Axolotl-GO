@@ -12,4 +12,4 @@ services:
 networks: 
   frontend:
     external:
-      name: gazzy_server_frontend
+      name: gazzyserver_frontend
