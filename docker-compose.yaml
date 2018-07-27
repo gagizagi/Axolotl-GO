@@ -4,8 +4,6 @@ services:
     build: ./axolotl
     image: axolotl:27.7
     container_name: axolotl
-    depends_on:
-      - mongo
     restart: always
     env_file: .env
     networks:
