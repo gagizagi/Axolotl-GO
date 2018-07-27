@@ -2,31 +2,16 @@ version: "3"
 services:
   axolotl:
     build: ./axolotl
-    image: axolotl:9.4
+    image: axolotl:27.7
     container_name: axolotl
     depends_on:
       - mongo
     restart: always
     env_file: .env
-  
-  mongo:
-    image: mongo
-    container_name: mongo
-    volumes:
-      - ~/Axolotl/.db:/data/db
-    restart: always
-  
-  nginx:
-    build: ./nginx
-    image: my-nginx:14.6
-    container_name: nginx
-    env_file: ./nginx/.env
-    volumes:
-      - ~/Axolotl/logs/nginx:/var/log/nginx
-      - ~/Axolotl/.certs/:/etc/nginx/certs
-    depends_on:
-      - axolotl
-    ports:
-      - 80:80
-      - 443:443
-    restart: always
+    networks:
+      - frontend
+
+networks: 
+  frontend:
+    external:
+      name: gazzy_server_frontend
