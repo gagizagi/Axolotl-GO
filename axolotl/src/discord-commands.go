@@ -188,8 +188,11 @@ func botInfo(args []string, m *discordgo.MessageCreate) {
 				Inline: true,
 			},
 			&discordgo.MessageEmbedField{
-				Name:   "Messages Parsed",
-				Value:  strconv.Itoa(botMessages),
+				Name: "Messages Parsed",
+				Value: fmt.Sprintf(
+					"%s(%s%%)",
+					strconv.Itoa(botMessages),
+					strconv.FormatFloat(float64(botMessages)/float64(botReads)*100, 'f', 1, 64)),
 				Inline: true,
 			},
 			&discordgo.MessageEmbedField{
