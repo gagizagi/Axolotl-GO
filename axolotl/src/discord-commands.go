@@ -16,7 +16,7 @@ func helpCommand(args []string, m *discordgo.MessageCreate) {
 	desc := "Notifies you of any new anime releases as soon as they are available.\n"
 	desc += "Subscribe to any anime you want to receive @mentions for with the `sub ID` command.\n\n"
 	desc += "[List of commands](https://github.com/gagizagi/Axolotl-GO#bot-commands)\n"
-	desc += "[List of anime](https://axolotl.gazzy.online/)\n\n"
+	desc += "[List of anime](https://axolotl.gazzy.eu/)\n\n"
 	desc += "[Bugs and suggestions](https://github.com/gagizagi/Axolotl-GO/issues)"
 
 	embed := &discordgo.MessageEmbed{
