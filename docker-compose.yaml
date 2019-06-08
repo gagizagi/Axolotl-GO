@@ -2,7 +2,7 @@ version: "3"
 services:
   axolotl:
     build: ./axolotl
-    image: axolotl:21.4.2019
+    image: axolotl:08.06.2019
     container_name: axolotl
     restart: always
     env_file: .env
