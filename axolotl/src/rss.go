@@ -14,7 +14,7 @@ import (
 var (
 	cutoff     time.Time
 	titleRegex = regexp.MustCompile(
-		`(?i)\[horriblesubs\] (.+) - ([0-9]{1,4}) \[(1080p|720p|480p)\]`)
+		`(?i)\[horriblesubs\] (.+) - ([0-9]{1,4}) \[(1080p|720p|480p|360p)\]`)
 	rssURL = "http://horriblesubs.info/rss.php?res=sd"
 )
 

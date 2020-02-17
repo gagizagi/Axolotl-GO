@@ -32,8 +32,8 @@ Bot has 99.9% uptime and is currently in daily use on over 200 servers.
 ---|---|---|---
 help|Returns a list of all available commands in Discord chat.|`!help`
 uptime|Returns current uptime of the bot.|`!uptime`
-sub|Subscribe to the anime series to receive @mentions whenever a new episode is released.|`!sub yls`|Get full list of series [here](https://axolotl.gazzy.online/)
-unsub|Unsubscribe from the anime series|`!unsub 6aj`|Get full list of series [here](https://axolotl.gazzy.online/)
+sub|Subscribe to the anime series to receive @mentions whenever a new episode is released.|`!sub yls`|Get full list of series [here](https://axolotl.gazzy.eu/)
+unsub|Unsubscribe from the anime series|`!unsub 6aj`|Get full list of series [here](https://axolotl.gazzy.eu/)
 mysubs|Lists all the anime you are subscribed to|`!mysubs`
 info|Returns information about the bot|`!info`
 prefix|Sets a new prefix for this bot on this server|`!prefix ?`|Server owner only
@@ -46,7 +46,7 @@ guilds|Returns a list of all the guilds this bot is in|`!guilds`|Admin only
 
 ### Contact
 
-PM me on discord @GazZy#5249
+PM me on discord @GazZy#0422
 
 or
 

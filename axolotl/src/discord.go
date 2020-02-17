@@ -107,7 +107,7 @@ func discordMsgDispatcher(c <-chan msgObject) {
 		if err != nil {
 			botResponses--
 			log.Printf("Error sending discord message on channel %s: %s - %s",
-				msg.Channel, msg.Message, err)
+				msg.Channel, msg.Message, err.Error())
 		}
 	}
 }
