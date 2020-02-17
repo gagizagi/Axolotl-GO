@@ -46,7 +46,7 @@ guilds|Returns a list of all the guilds this bot is in|`!guilds`|Admin only
 
 ### Contact
 
-PM me on discord @GazZy#5249
+PM me on discord @GazZy#0422
 
 or
 
