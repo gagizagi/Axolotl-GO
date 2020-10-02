@@ -1,3 +1,12 @@
+### End of life for axolotl
+With https://horriblesubs.info/ ending their run so does this bot.
+The bot relied heavily on horriblesubs for accurate and reliable episode announcements.
+We had a good run but now its time for new projects
+
+Some of the stats:
+* Guilds: 531
+* Unique Subscribers: 1650
+
 # Axolotl-GO
 
 ![alt text](https://cdn.discordapp.com/avatars/185177851799011329/85e5f93a566888a3151192749cd78746.jpg "Axolotl so moe")
@@ -50,7 +59,7 @@ PM me on discord @GazZy#0422
 
 or
 
-Visit us in our Discord guild at [422 Discord](https://discord.gg/0cO53vq26OlEojNi)
+~~Visit us in our Discord guild at [422 Discord]()~~
 
 ### Credits
 
