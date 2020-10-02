@@ -1,3 +1,5 @@
+# UPDATE 02.10.2020
+
 ### End of life for axolotl
 With https://horriblesubs.info/ ending their run so does this bot.
 The bot relied heavily on horriblesubs for accurate and reliable episode announcements.
